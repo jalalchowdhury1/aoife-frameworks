@@ -1,10 +1,11 @@
 import type { Framework, Problem, Step } from "../types";
 import type { Rng } from "../rng";
 
+// knownPhrase is how we refer to the known part mid-sentence.
 const SKINS = [
-  { wholeNoun: "flowers", partAlabel: "red", partBlabel: "not red" },
-  { wholeNoun: "children", partAlabel: "boys", partBlabel: "girls" },
-  { wholeNoun: "fruit", partAlabel: "apples", partBlabel: "not apples" },
+  { wholeNoun: "flowers", partAlabel: "red", partBlabel: "not red", knownPhrase: "the red ones" },
+  { wholeNoun: "children", partAlabel: "boys", partBlabel: "girls", knownPhrase: "the boys" },
+  { wholeNoun: "fruit", partAlabel: "apples", partBlabel: "not apples", knownPhrase: "the apples" },
 ];
 
 export const partPartWhole: Framework = {
@@ -19,7 +20,10 @@ export const partPartWhole: Framework = {
   generate(rng: Rng): Problem {
     const s = rng.pick(SKINS);
     const whole = rng.int(10, 30);
-    const partA = rng.int(2, whole - 2);
+    let partA = rng.int(2, whole - 2);
+    // Keep the two parts different — if they're equal, a child who mixes up
+    // "known part" and "missing part" would still look correct.
+    if (partA * 2 === whole) partA += 1;
     const partB = whole - partA;
 
     const steps: Step[] = [
@@ -28,21 +32,21 @@ export const partPartWhole: Framework = {
         input: "number",
         ask: "What is the WHOLE (the total)?",
         answer: whole,
-        hint: `The whole is the "in all" number — every ${s.wholeNoun} together.`,
+        hint: `The whole is the "There are…" number — all the ${s.wholeNoun} together.`,
         decoyQuestions: [
-          `How many ${s.partBlabel}?`,
+          `How many are ${s.partBlabel}?`,
           `What is ${partA} + ${whole}?`,
         ],
       },
       {
         id: "known",
         input: "number",
-        ask: `What part do you already know? (the ${s.partAlabel})`,
+        ask: `What part do you already know? (${s.knownPhrase})`,
         answer: partA,
-        hint: `It's the number the problem already tells you — how many are ${s.partAlabel}.`,
+        hint: `It's the part the problem already counts for you — how many are ${s.partAlabel}.`,
         decoyQuestions: [
           `What is the WHOLE (the total)?`,
-          `How many ${s.partBlabel}?`,
+          `How many are ${s.partBlabel}?`,
         ],
       },
       {
@@ -69,7 +73,7 @@ export const partPartWhole: Framework = {
         ],
       },
       steps,
-      finalAsk: `How many ${s.partBlabel}?`,
+      finalAsk: `How many are ${s.partBlabel}?`,
       finalAnswers: [{ label: s.partBlabel, value: partB }],
       data: { whole, partA, partB },
     };

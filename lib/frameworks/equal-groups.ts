@@ -1,12 +1,13 @@
 import type { Framework, Problem, Step } from "../types";
 import type { Rng } from "../rng";
 
+// `on`/`onto` for flat surfaces (plates, shelves), `in`/`into` for containers.
 const SKINS = [
-  { container: "bags", containerOne: "bag", item: "marbles" },
-  { container: "boxes", containerOne: "box", item: "crayons" },
-  { container: "plates", containerOne: "plate", item: "cookies" },
-  { container: "vases", containerOne: "vase", item: "flowers" },
-  { container: "shelves", containerOne: "shelf", item: "books" },
+  { container: "bags", containerOne: "bag", item: "marbles", on: "in", onto: "into" },
+  { container: "boxes", containerOne: "box", item: "crayons", on: "in", onto: "into" },
+  { container: "plates", containerOne: "plate", item: "cookies", on: "on", onto: "onto" },
+  { container: "vases", containerOne: "vase", item: "flowers", on: "in", onto: "into" },
+  { container: "shelves", containerOne: "shelf", item: "books", on: "on", onto: "onto" },
 ];
 
 export const equalGroups: Framework = {
@@ -20,11 +21,12 @@ export const equalGroups: Framework = {
   generate(rng: Rng): Problem {
     const s = rng.pick(SKINS);
     const groups = rng.int(2, 6);
-    const each = rng.int(2, 9);
+    let each = rng.int(2, 9);
+    // 2 groups of 2 is the one case where groups+each === groups×each, which
+    // would make the "What is 2 + 2?" decoy compute the right answer. Skip it.
+    if (groups === 2 && each === 2) each = 3;
     const total = groups * each;
     const variant = rng.pick(["total", "each"]);
-
-    const figure = { kind: "dotArray", rows: groups, cols: each };
 
     if (variant === "total") {
       const steps: Step[] = [
@@ -33,7 +35,7 @@ export const equalGroups: Framework = {
           input: "number",
           ask: `How many ${s.container} are there?`,
           answer: groups,
-          hint: `Count the ${s.container} in the problem: ${groups}.`,
+          hint: `Look at the first sentence — it tells you the number of ${s.container}.`,
           decoyQuestions: [
             `How many ${s.item} in all?`,
             `What is ${groups} + ${each}?`,
@@ -42,9 +44,9 @@ export const equalGroups: Framework = {
         {
           id: "each",
           input: "number",
-          ask: `How many ${s.item} in each ${s.containerOne}?`,
+          ask: `How many ${s.item} ${s.on} each ${s.containerOne}?`,
           answer: each,
-          hint: `Every ${s.containerOne} holds the same amount: ${each}.`,
+          hint: `Every ${s.containerOne} holds the same amount — the problem says how many.`,
           decoyQuestions: [
             `How many ${s.container} are there?`,
             `What is ${groups} + ${each}?`,
@@ -58,14 +60,14 @@ export const equalGroups: Framework = {
           hint: `${groups} equal groups of ${each}: ${groups} × ${each}.`,
           decoyQuestions: [
             `What is ${groups} + ${each}?`,
-            `How many ${s.item} are in one ${s.containerOne}?`,
+            `How many ${s.item} are ${s.on} one ${s.containerOne}?`,
           ],
         },
       ];
 
       return {
-        promptText: `There are ${groups} ${s.container} with ${each} ${s.item} in each. How many ${s.item} in all?`,
-        figure,
+        promptText: `There are ${groups} ${s.container} with ${each} ${s.item} ${s.on} each. How many ${s.item} in all?`,
+        figure: { kind: "dotArray", rows: groups, cols: each },
         steps,
         finalAsk: `How many ${s.item} in all?`,
         finalAnswers: [{ label: "in all", value: total }],
@@ -73,25 +75,26 @@ export const equalGroups: Framework = {
       };
     }
 
-    // variant === "each"
+    // variant === "each" — sharing/division. No dot-array figure here: a full
+    // array would let her read the answer straight off one row.
     const steps: Step[] = [
       {
         id: "total",
         input: "number",
         ask: `How many ${s.item} in all?`,
         answer: total,
-        hint: `It's the "shared equally" number: ${total}.`,
+        hint: `It's the number being shared out — the first number in the story.`,
         decoyQuestions: [
-          `How many ${s.container} to share into?`,
+          `How many ${s.container} to share ${s.onto}?`,
           `What is ${total} + ${groups}?`,
         ],
       },
       {
         id: "groups",
         input: "number",
-        ask: `How many ${s.container} to share into?`,
+        ask: `How many ${s.container} to share ${s.onto}?`,
         answer: groups,
-        hint: `Count the ${s.container} you split them between: ${groups}.`,
+        hint: `The story says how many ${s.container} the ${s.item} are split between.`,
         decoyQuestions: [
           `How many ${s.item} in all?`,
           `What is ${total} + ${groups}?`,
@@ -111,10 +114,9 @@ export const equalGroups: Framework = {
     ];
 
     return {
-      promptText: `${total} ${s.item} are shared equally into ${groups} ${s.container}. How many ${s.item} in each?`,
-      figure,
+      promptText: `${total} ${s.item} are shared equally ${s.onto} ${groups} ${s.container}. How many ${s.item} ${s.on} each ${s.containerOne}?`,
       steps,
-      finalAsk: `How many ${s.item} in each ${s.containerOne}?`,
+      finalAsk: `How many ${s.item} ${s.on} each ${s.containerOne}?`,
       finalAnswers: [{ label: "in each", value: each }],
       data: { groups, each, total },
     };
