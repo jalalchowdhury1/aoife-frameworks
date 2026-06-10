@@ -122,15 +122,11 @@ export function StageEngine({ framework }: { framework: Framework }) {
         <>
           <div className="text-center text-sm text-purple-500 mb-2">{STAGE_BLURB[stage]}</div>
 
-          {/* Problem statement (hidden during solo, where SoloRunner shows it) */}
-          {stage !== "solo" && (
-            <>
-              <div className="bg-white border-4 border-pink-200 rounded-2xl p-4 mb-3 text-lg text-gray-800 leading-snug">
-                {problem.promptText}
-              </div>
-              <Figure spec={problem.figure} />
-            </>
-          )}
+          {/* Problem statement + figure shown in EVERY stage, including Solo. */}
+          <div className="bg-white border-4 border-pink-200 rounded-2xl p-4 mb-3 text-lg text-gray-800 leading-snug">
+            {problem.promptText}
+          </div>
+          <Figure spec={problem.figure} />
 
           <StageRunner
             key={`${stage}:${seed}`}

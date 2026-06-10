@@ -49,8 +49,12 @@ export const patternsRules: Framework = {
 
     const shown = `${t0}, ${t1}, ${t2}, ${t3}, ___`;
 
+    // The additive decoy must be a TEMPTING wrong rule. For a doubling pattern
+    // the tempting mistake is "add the first gap" (e.g. 2,4,8,16 looks like +2),
+    // never "add 0".
+    const addStep = isMul ? t1 - t0 : step;
     const ruleChoices = [
-      { label: `Add ${step} each time`, value: "add" },
+      { label: `Add ${addStep} each time`, value: "add" },
       { label: "Multiply by 2 each time", value: "mul" },
     ];
 
@@ -65,7 +69,7 @@ export const patternsRules: Framework = {
           ? `Look at ${t0} then ${t1}, then ${t1} then ${t2}. Each number is double the one before.`
           : `Look at ${t0} then ${t1}. How much bigger? Check ${t1} to ${t2} too — it's the same jump.`,
         decoyQuestions: [
-          `What is ${t0} + ${t3}?`,
+          `What is ${t3} − ${t0}?`,
           `What number comes after ${t4}?`,
         ],
       },
@@ -78,8 +82,8 @@ export const patternsRules: Framework = {
           ? `Double ${t3}: ${t3} × 2.`
           : `Add ${step} to ${t3}: ${t3} + ${step}.`,
         decoyQuestions: [
-          `What is ${t0} + ${t3}?`,
-          isMul ? `What is ${t3} + 2?` : `What is ${t3} × ${step}?`,
+          `What is ${t3} − ${t0}?`,
+          isMul ? `What is ${t3} + ${addStep}?` : `What is ${t3} × ${step}?`,
         ],
       },
     ];

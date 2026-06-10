@@ -28,12 +28,28 @@ describe("every framework generator", () => {
           expect(s.decoyQuestions).not.toContain(s.ask);
           expect(s.hint.length, `${fw.id} ${s.id} hint`).toBeGreaterThan(0);
         }
+        // The question-script must actually REACH every final answer: each
+        // finalAnswer.value has to be the answer of some number step (otherwise
+        // the child is walked through a script that never computes the answer).
+        const numberStepAnswers = new Set(
+          p.steps.filter((s) => s.input === "number").map((s) => s.answer as number),
+        );
         for (const fa of p.finalAnswers) {
           expect(
             Number.isInteger(fa.value) && fa.value >= 0,
             `${fw.id} final ${fa.label}=${fa.value}`,
           ).toBe(true);
+          expect(
+            numberStepAnswers.has(fa.value),
+            `${fw.id} final ${fa.label}=${fa.value} is never derived by a step @${seed}`,
+          ).toBe(true);
         }
+        // The script must END on an answer: the last step's answer is a final answer.
+        const last = p.steps[p.steps.length - 1];
+        expect(
+          p.finalAnswers.some((fa) => fa.value === last.answer),
+          `${fw.id} last step "${last.id}" (=${String(last.answer)}) is not a final answer @${seed}`,
+        ).toBe(true);
         // framework-specific truth
         expect(fw.invariant(p.data), `${fw.id} invariant @${seed}`).toBe(true);
       }

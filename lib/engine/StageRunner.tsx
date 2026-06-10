@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Problem, Stage, Step } from "../types";
 import { makeRng } from "../rng";
-import { Figure } from "../figures/Figure";
 import { Numpad } from "./Numpad";
 import { ChoicePad } from "./ChoicePad";
 
@@ -256,7 +255,6 @@ function SoloRunner({
 
   return (
     <div className="flex flex-col gap-4">
-      <Figure spec={problem.figure} />
       <div className="text-center text-xl font-bold text-purple-800">{problem.finalAsk}</div>
 
       <div className="flex justify-center gap-3 flex-wrap">

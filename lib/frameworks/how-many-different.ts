@@ -84,7 +84,7 @@ export const howManyDifferent: Framework = {
     ];
 
     return {
-      promptText: `${s.intro}: ${numList}. How many DIFFERENT products can you make by multiplying any two of these ${s.thing}? ${numList}`,
+      promptText: `${s.intro}: ${numList}. How many DIFFERENT products can you make by multiplying any two of these ${s.thing}?`,
       steps,
       finalAsk: "How many different products?",
       finalAnswers: [{ label: "different products", value: distinct }],

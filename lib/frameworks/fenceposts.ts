@@ -2,11 +2,11 @@ import type { Framework, Problem, Step } from "../types";
 import type { Rng } from "../rng";
 
 const SKINS = [
-  { thing: "stakes", unit: "inches" },
-  { thing: "trees", unit: "feet" },
-  { thing: "fence posts", unit: "feet" },
-  { thing: "lamp posts", unit: "meters" },
-  { thing: "flags", unit: "feet" },
+  { thing: "stakes", one: "stake", unit: "inches" },
+  { thing: "trees", one: "tree", unit: "feet" },
+  { thing: "fence posts", one: "fence post", unit: "feet" },
+  { thing: "lamp posts", one: "lamp post", unit: "meters" },
+  { thing: "flags", one: "flag", unit: "feet" },
 ];
 
 export const fenceposts: Framework = {
@@ -20,6 +20,7 @@ export const fenceposts: Framework = {
   generate(rng: Rng): Problem {
     const skin = rng.pick(SKINS);
     const things = skin.thing;
+    const one = skin.one;
     const unit = skin.unit;
     const s = rng.int(2, 5);
     const gaps = rng.int(3, 9);
@@ -56,9 +57,9 @@ export const fenceposts: Framework = {
       {
         id: "posts",
         input: "number",
-        ask: `Posts = gaps + 1. So how many ${things}? (${gaps} + 1)`,
+        ask: `One more than the number of gaps: ${gaps} + 1. So how many ${things}?`,
         answer: posts,
-        hint: `There's always one more ${things} than gaps: ${gaps} + 1.`,
+        hint: `There's always one more ${one} than there are gaps: ${gaps} + 1.`,
         decoyQuestions: [
           `How many gaps are there?`,
           `What is ${D} × ${s}?`,

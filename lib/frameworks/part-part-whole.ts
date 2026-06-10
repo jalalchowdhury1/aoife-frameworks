@@ -37,9 +37,9 @@ export const partPartWhole: Framework = {
       {
         id: "known",
         input: "number",
-        ask: `What part do you already know? (the ${s.partAlabel} ones)`,
+        ask: `What part do you already know? (the ${s.partAlabel})`,
         answer: partA,
-        hint: `It's the number the problem already tells you — the ${s.partAlabel} ${s.wholeNoun}.`,
+        hint: `It's the number the problem already tells you — how many are ${s.partAlabel}.`,
         decoyQuestions: [
           `What is the WHOLE (the total)?`,
           `How many ${s.partBlabel}?`,

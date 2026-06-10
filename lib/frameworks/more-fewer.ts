@@ -7,10 +7,13 @@ interface Skin {
   item: string; // unit word, "" when the names already say the thing (apples/oranges)
 }
 
+// Proper names keep "<who> has <n>" grammatical in every position
+// (sentence start and mid-sentence "does <who> have").
 const SKINS: Skin[] = [
-  { whoBig: "Aoife", whoSmall: "her friend", item: "stickers" },
-  { whoBig: "the red jar", whoSmall: "the blue jar", item: "marbles" },
-  { whoBig: "the apples", whoSmall: "the oranges", item: "" },
+  { whoBig: "Aoife", whoSmall: "Mia", item: "stickers" },
+  { whoBig: "Sam", whoSmall: "Ben", item: "marbles" },
+  { whoBig: "Zoe", whoSmall: "Kai", item: "shells" },
+  { whoBig: "Ada", whoSmall: "Leo", item: "coins" },
 ];
 
 export const moreFewer: Framework = {

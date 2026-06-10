@@ -30,7 +30,9 @@ export const multiStepMoney: Framework = {
       p = rng.int(4, 9);
       n = rng.int(2, 6);
       total = n * p;
-      q = rng.int(2, 6);
+      // The swap item must be genuinely CHEAPER (q < p) so the "same money buys
+      // more of a cheaper thing" premise holds.
+      q = rng.int(2, Math.min(6, p - 1));
       if (total % q === 0) {
         k = total / q;
         if (k >= 2 && k <= 15) break;

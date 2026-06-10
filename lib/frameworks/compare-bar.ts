@@ -1,10 +1,12 @@
 import type { Framework, Problem, Step } from "../types";
 import type { Rng } from "../rng";
 
+// Proper names so "<A> has <m> more than <B>" reads correctly everywhere.
 const SKINS = [
   { a: "Sam", b: "Mia", item: "marbles" },
-  { a: "the red box", b: "the blue box", item: "beads" },
+  { a: "Zoe", b: "Kai", item: "beads" },
   { a: "Tom", b: "Ben", item: "cards" },
+  { a: "Ada", b: "Leo", item: "shells" },
 ];
 
 export const compareBar: Framework = {

@@ -5,7 +5,7 @@ const SKINS = [
   { a: "ducks", b: "goats", aOne: "duck", bOne: "goat", la: 2, lb: 4, unit: "legs", unitOne: "leg" },
   { a: "hens", b: "cows", aOne: "hen", bOne: "cow", la: 2, lb: 4, unit: "legs", unitOne: "leg" },
   { a: "kids", b: "dogs", aOne: "kid", bOne: "dog", la: 2, lb: 4, unit: "legs", unitOne: "leg" },
-  { a: "bikes", b: "trikes", aOne: "bike", bOne: "trike", la: 2, lb: 3, unit: "wheels", unitOne: "wheel" },
+  { a: "chickens", b: "sheep", aOne: "chicken", bOne: "sheep", la: 2, lb: 4, unit: "legs", unitOne: "leg" },
 ];
 
 export const twoKinds: Framework = {
