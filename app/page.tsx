@@ -12,10 +12,13 @@ export default function Home() {
   const [showPeek, setShowPeek] = useState(false);
   const taps = useRef<number[]>([]);
 
+  // Client-only init: localStorage must be read after mount, not in render.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     setProgress(readProgress());
     setReady(true);
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Hidden parent peek: 5 quick taps on the title within 2s.
   const onTitleTap = () => {

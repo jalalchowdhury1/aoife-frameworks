@@ -2,10 +2,10 @@ import type { Framework, Problem, Step } from "../types";
 import type { Rng } from "../rng";
 
 const SKINS = [
-  { a: "ducks", b: "goats", la: 2, lb: 4, unit: "legs" },
-  { a: "hens", b: "cows", la: 2, lb: 4, unit: "legs" },
-  { a: "kids", b: "dogs", la: 2, lb: 4, unit: "legs" },
-  { a: "bikes", b: "trikes", la: 2, lb: 3, unit: "wheels" },
+  { a: "ducks", b: "goats", aOne: "duck", bOne: "goat", la: 2, lb: 4, unit: "legs", unitOne: "leg" },
+  { a: "hens", b: "cows", aOne: "hen", bOne: "cow", la: 2, lb: 4, unit: "legs", unitOne: "leg" },
+  { a: "kids", b: "dogs", aOne: "kid", bOne: "dog", la: 2, lb: 4, unit: "legs", unitOne: "leg" },
+  { a: "bikes", b: "trikes", aOne: "bike", bOne: "trike", la: 2, lb: 3, unit: "wheels", unitOne: "wheel" },
 ];
 
 export const twoKinds: Framework = {
@@ -52,9 +52,9 @@ export const twoKinds: Framework = {
       {
         id: "legs",
         input: "number",
-        ask: `How many ${s.unit} does ONE ${s.b} have?`,
+        ask: `How many ${s.unit} does ONE ${s.bOne} have?`,
         answer: s.lb,
-        hint: `A ${s.b} has ${s.lb} ${s.unit}.`,
+        hint: `A ${s.bOne} has ${s.lb} ${s.unit}.`,
         decoyQuestions: [
           `How many ${s.unit} does one ${s.a} have?`,
           `What is ${total} − ${attr}?`,
@@ -63,7 +63,7 @@ export const twoKinds: Framework = {
       {
         id: "allA",
         input: "number",
-        ask: `Pretend ALL ${total} were ${s.a} (the ${s.la}-${s.unit} kind). How many ${s.unit} is that?`,
+        ask: `Pretend ALL ${total} were ${s.a} (the ${s.la}-${s.unitOne} kind). How many ${s.unit} is that?`,
         answer: allA,
         hint: `${total} ${s.a}, each with ${s.la} ${s.unit}: ${total} × ${s.la}.`,
         decoyQuestions: [`What is ${total} + ${attr}?`, `How many ${s.b} are there?`],
@@ -79,9 +79,9 @@ export const twoKinds: Framework = {
       {
         id: "perSwap",
         input: "number",
-        ask: `Each time we swap one ${s.a} for one ${s.b}, how many MORE ${s.unit}?`,
+        ask: `Each time we swap one ${s.aOne} for one ${s.bOne}, how many MORE ${s.unit}?`,
         answer: perSwap,
-        hint: `A ${s.b} has ${s.lb}, a ${s.a} has ${s.la}: ${s.lb} − ${s.la}.`,
+        hint: `A ${s.bOne} has ${s.lb}, a ${s.aOne} has ${s.la}: ${s.lb} − ${s.la}.`,
         decoyQuestions: [`How many ${s.b} are there?`, `What is ${s.lb} + ${s.la}?`],
       },
       {

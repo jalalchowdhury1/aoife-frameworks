@@ -28,6 +28,9 @@ export function StageEngine({ framework }: { framework: Framework }) {
   const [finished, setFinished] = useState<Stage | null>(null);
 
   // Client-only init: read progress + pick the starting stage + a random problem.
+  // localStorage/Math.random must run after mount (not in render) to avoid hydration
+  // mismatch; this synchronous setState-in-effect is intentional.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     const p = readProgress();
     setProgress(p);
@@ -35,6 +38,7 @@ export function StageEngine({ framework }: { framework: Framework }) {
     setSeed(randomSeed());
     setReady(true);
   }, [framework.id]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const problem = useMemo(
     () => framework.generate(makeRng(seed)),
