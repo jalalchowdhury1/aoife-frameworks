@@ -89,7 +89,7 @@ export const patternsRules: Framework = {
     ];
 
     return {
-      promptText: `What number comes next in the pattern?  ${s.who} ${s.verb}: ${shown}`,
+      promptText: `What number comes next in the pattern? ${s.who} ${s.verb}: ${shown}`,
       figure: { kind: "sequence", terms: [t0, t1, t2, t3, null] },
       steps,
       finalAsk: "What comes next?",

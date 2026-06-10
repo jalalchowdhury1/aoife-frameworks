@@ -26,10 +26,10 @@ export const workingBackwards: Framework = {
         input: "number",
         ask: "What is the amount at the END (now)?",
         answer: end,
-        hint: `It's the number Aoife has RIGHT NOW: ${end}.`,
+        hint: `It's the number Aoife has RIGHT NOW — the "now she has…" number.`,
         decoyQuestions: [
           `How many ${item} did she start with?`,
-          `What is ${g} + ${bMore}?`,
+          `How many ${item} did she give away?`,
         ],
       },
       {
@@ -39,7 +39,7 @@ export const workingBackwards: Framework = {
         answer: afterUndoGot,
         hint: `Rewind the last step. Getting more means we take those ${bMore} back away: ${end} − ${bMore}.`,
         decoyQuestions: [
-          `What is ${end} + ${bMore}?`,
+          `How many ${item} does she have now?`,
           `How many ${item} did she give away first?`,
         ],
       },
@@ -50,8 +50,8 @@ export const workingBackwards: Framework = {
         answer: start,
         hint: `Rewind the giving step. Giving away means we put those ${g} back: ${afterUndoGot} + ${g}.`,
         decoyQuestions: [
-          `What is ${afterUndoGot} − ${g}?`,
-          `What is ${end} now?`,
+          `How many ${item} does she have now?`,
+          `How many ${item} did she get?`,
         ],
       },
     ];

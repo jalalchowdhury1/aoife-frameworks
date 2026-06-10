@@ -1,7 +1,11 @@
 import type { Framework, Problem, Step } from "../types";
 import type { Rng } from "../rng";
 
-const POOL = [2, 3, 4, 5, 6, 8] as const;
+// Collision-rich pool: many 4-number subsets contain a proportional quad
+// (e.g. 2·6 = 3·4, 4·6 = 3·8, 2·12 = 4·6), so duplicate products — and the
+// "cross out the duplicates" lesson — show up far more often than with all
+// coprime-ish numbers.
+const POOL = [2, 3, 4, 6, 8, 12] as const;
 
 const SKINS = [
   {
@@ -53,9 +57,9 @@ export const howManyDifferent: Framework = {
         input: "number",
         ask: "How many pairs can you make from 4 numbers (choosing 2)?",
         answer: pairs,
-        hint: "Pick the first number, then each of the other 3 — count carefully without repeating a pair: it comes to 6.",
+        hint: "Count them in order: the 1st number pairs with 3 others, the 2nd with 2 new ones, the 3rd with 1 — that's 3 + 2 + 1 = 6.",
         decoyQuestions: [
-          `What is ${nums[0]} + ${nums[1]}?`,
+          "How many numbers are in the set?",
           "How many DIFFERENT products are left at the end?",
         ],
       },
@@ -78,7 +82,7 @@ export const howManyDifferent: Framework = {
         hint: "Look down your list of 6 products. Each time you see a number that already appeared, cross it out — then count what is left.",
         decoyQuestions: [
           "How many pairs did you start with?",
-          `What is ${nums[2]} + ${nums[3]}?`,
+          "How many numbers did you start with?",
         ],
       },
     ];

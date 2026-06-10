@@ -48,7 +48,7 @@ export const multiStepMoney: Framework = {
         hint: `She had enough for ${n} ${s.a} at $${p} each: ${n} × ${p}.`,
         decoyQuestions: [
           `How many ${s.b} can she buy?`,
-          `What is ${n} + ${p}?`,
+          `What does one ${s.a.replace(/s$/, "")} cost?`,
         ],
       },
       {

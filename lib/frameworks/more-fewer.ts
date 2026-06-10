@@ -40,7 +40,7 @@ export const moreFewer: Framework = {
         ? `How many MORE does ${s.whoBig} have?`
         : `How many FEWER does ${s.whoSmall} have?`;
 
-    const promptText = `${s.whoBig} has ${big}${itemTxt}. ${s.whoSmall} has ${small}. ${question}`;
+    const promptText = `${s.whoBig} has ${big}${itemTxt}. ${s.whoSmall} has ${small}${itemTxt}. ${question}`;
 
     const steps: Step[] = [
       {
@@ -76,8 +76,8 @@ export const moreFewer: Framework = {
       figure: {
         kind: "bars",
         bars: [
-          { label: "big", value: big, known: true },
-          { label: "small", value: small, known: true },
+          { label: s.whoBig, value: big, known: true },
+          { label: s.whoSmall, value: small, known: true },
         ],
       },
       steps,

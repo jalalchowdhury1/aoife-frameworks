@@ -27,6 +27,30 @@ describe("every framework generator", () => {
           expect(s.decoyQuestions.length, `${fw.id} ${s.id} decoys`).toBeGreaterThanOrEqual(2);
           expect(s.decoyQuestions).not.toContain(s.ask);
           expect(s.hint.length, `${fw.id} ${s.id} hint`).toBeGreaterThan(0);
+          // A "What is A op B?" decoy must NOT evaluate to a real answer in this
+          // problem (this step's answer, or any final answer) — otherwise the
+          // wrong question rewards/teaches the wrong arithmetic. Guards the whole
+          // "decoy-correct" class found in the 2026-06-10 audit.
+          const realValues = new Set<number>([
+            ...(s.input === "number" ? [s.answer as number] : []),
+            ...p.finalAnswers.map((fa) => fa.value),
+          ]);
+          for (const decoy of s.decoyQuestions) {
+            const m = decoy.match(/What is (\d+) ([+−\-×x*÷/]) (\d+)\?/);
+            if (!m) continue;
+            const a = Number(m[1]);
+            const b = Number(m[3]);
+            const op = m[2];
+            const val =
+              op === "+" ? a + b
+              : op === "×" || op === "x" || op === "*" ? a * b
+              : op === "÷" || op === "/" ? (b !== 0 ? a / b : NaN)
+              : a - b; // − or -
+            expect(
+              !realValues.has(val),
+              `${fw.id} ${s.id} decoy "${decoy}" = ${val} equals a real answer @${seed}`,
+            ).toBe(true);
+          }
         }
         // The question-script must actually REACH every final answer: each
         // finalAnswer.value has to be the answer of some number step (otherwise

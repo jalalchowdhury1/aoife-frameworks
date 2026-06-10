@@ -48,7 +48,6 @@ export const guessCheck: Framework = {
         hint: `The two numbers multiply to ${P}: ${P} ÷ ${x} = ${y}. Now check it — ${x} + ${y} should equal ${S}.`,
         decoyQuestions: [
           `What is ${P} × ${x}?`,
-          `What is ${S} ÷ ${x}?`,
           `What is ${P} + ${x}?`,
         ],
       },

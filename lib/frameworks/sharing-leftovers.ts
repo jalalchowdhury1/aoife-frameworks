@@ -3,8 +3,8 @@ import type { Rng } from "../rng";
 
 const SKINS = [
   { item: "empanadas", one: "empanada", container: "box", containers: "boxes", who: "Mrs. Garcia", pron: "She" },
-  { item: "cookies", one: "cookie", container: "plate", containers: "plates", who: "Mr. Patel", pron: "He" },
-  { item: "stickers", one: "sticker", container: "page", containers: "pages", who: "Miss Ruiz", pron: "She" },
+  { item: "cookies", one: "cookie", container: "tin", containers: "tins", who: "Mr. Patel", pron: "He" },
+  { item: "buttons", one: "button", container: "jar", containers: "jars", who: "Miss Ruiz", pron: "She" },
   { item: "marbles", one: "marble", container: "bag", containers: "bags", who: "Grandpa Joe", pron: "He" },
   { item: "pencils", one: "pencil", container: "cup", containers: "cups", who: "Aunt Mei", pron: "She" },
 ];

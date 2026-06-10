@@ -49,7 +49,7 @@ export const crossNumberGrid: Framework = {
         answer: c,
         hint: `Add the two top numbers together: ${a} + ${b}.`,
         decoyQuestions: [
-          `What is ${a} + ${dd}?`,
+          `Which box should you fill in LAST?`,
           `What is ${a} + ${b} + ${dd} + ${e}?`,
         ],
       },
@@ -60,8 +60,8 @@ export const crossNumberGrid: Framework = {
         answer: g,
         hint: `Add the top-left and middle-left numbers: ${a} + ${dd}.`,
         decoyQuestions: [
-          `What is ${a} + ${b}?`,
-          `What is ${a} − ${dd}?`,
+          `Which line did you already finish?`,
+          `What is the biggest number in the grid?`,
         ],
       },
     ];

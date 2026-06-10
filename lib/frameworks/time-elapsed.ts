@@ -46,7 +46,7 @@ export const timeElapsed: Framework = {
         input: "number",
         ask: `Change the START time to minutes (hours × 60 + minutes): ${startHr} × 60 + ${startMin}`,
         answer: startTotal,
-        hint: `${startHr} hours is ${startHr} × 60 = ${startHr * 60} minutes, then add the ${startMin}: ${startHr * 60} + ${startMin}.`,
+        hint: `${startHr === 1 ? "1 hour" : `${startHr} hours`} is ${startHr} × 60 = ${startHr * 60} minutes, then add the ${startMin}: ${startHr * 60} + ${startMin}.`,
         decoyQuestions: [`What is ${startHr} + ${startMin}?`, `What time does it end?`],
       },
       {
@@ -54,8 +54,8 @@ export const timeElapsed: Framework = {
         input: "number",
         ask: `Change the END time to minutes: ${endHr} × 60 + ${endMin}`,
         answer: endTotal,
-        hint: `${endHr} hours is ${endHr} × 60 = ${endHr * 60} minutes, then add the ${endMin}: ${endHr * 60} + ${endMin}.`,
-        decoyQuestions: [`What is ${endHr} + ${endMin}?`, `What is ${startTotal} + ${endMin}?`],
+        hint: `${endHr === 1 ? "1 hour" : `${endHr} hours`} is ${endHr} × 60 = ${endHr * 60} minutes, then add the ${endMin}: ${endHr * 60} + ${endMin}.`,
+        decoyQuestions: [`What is ${endHr} + ${endMin}?`, `What time does it start?`],
       },
       {
         id: "elapsed",

@@ -65,7 +65,7 @@ export const twoClue: Framework = {
         input: "number",
         ask: `Then ${s.moverP} = ${s.spotP} + ${a}: ${flowers} + ${a}`,
         answer: bees,
-        hint: `There are ${a} more ${s.moverP} than ${s.spotP}: ${flowers} + ${a}.`,
+        hint: `There ${a === 1 ? `is ${a} more ${s.moverS}` : `are ${a} more ${s.moverP}`} than ${s.spotP}: ${flowers} + ${a}.`,
         decoyQuestions: [`What is ${flowers} − ${a}?`, `How many ${s.spotP} are empty?`],
       },
     ];

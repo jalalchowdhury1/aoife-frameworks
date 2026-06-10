@@ -56,8 +56,8 @@ export const twoKinds: Framework = {
         answer: s.lb,
         hint: `A ${s.bOne} has ${s.lb} ${s.unit}.`,
         decoyQuestions: [
-          `How many ${s.unit} does one ${s.a} have?`,
-          `What is ${total} − ${attr}?`,
+          `How many ${s.unit} does one ${s.aOne} have?`,
+          `What is ${attr} − ${total}?`,
         ],
       },
       {
@@ -82,7 +82,7 @@ export const twoKinds: Framework = {
         ask: `Each time we swap one ${s.aOne} for one ${s.bOne}, how many MORE ${s.unit}?`,
         answer: perSwap,
         hint: `A ${s.bOne} has ${s.lb}, a ${s.aOne} has ${s.la}: ${s.lb} − ${s.la}.`,
-        decoyQuestions: [`How many ${s.b} are there?`, `What is ${s.lb} + ${s.la}?`],
+        decoyQuestions: [`How many ${s.b} are there?`, `Which kind has more ${s.unit}?`],
       },
       {
         id: "countB",
@@ -90,7 +90,7 @@ export const twoKinds: Framework = {
         ask: `So how many ${s.b} are there? (extra ÷ ${perSwap})`,
         answer: countB,
         hint: `${extra} extra ${s.unit}, ${perSwap} per swap: ${extra} ÷ ${perSwap}.`,
-        decoyQuestions: [`How many ${s.a}?`, `What is ${extra} × ${perSwap}?`],
+        decoyQuestions: [`How many ${s.a}?`, `Which kind is there more of?`],
       },
       {
         id: "countA",

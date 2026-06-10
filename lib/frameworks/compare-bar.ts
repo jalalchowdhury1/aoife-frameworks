@@ -68,7 +68,7 @@ export const compareBar: Framework = {
         answer: bigger,
         hint: `${s.a} has ${s.b}'s amount plus the ${m} extra.`,
         decoyQuestions: [
-          `What is ${smaller} − ${m}?`,
+          `What is ${total} + ${m}?`,
           `How many ${s.item} are there in all?`,
         ],
       },

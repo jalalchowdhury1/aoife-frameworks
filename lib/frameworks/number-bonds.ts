@@ -49,8 +49,8 @@ export const numberBonds: Framework = {
         answer: s1,
         hint: `Add the two known circles: ${c1} + ${c2}.`,
         decoyQuestions: [
-          `What is ${c1} − ${c2}?`,
-          `What is the missing circle?`,
+          `What is ${c1} × ${c2}?`,
+          `Which circle is the biggest?`,
         ],
       },
       {
@@ -60,7 +60,7 @@ export const numberBonds: Framework = {
         answer: c3,
         hint: `A square minus one of its circles gives the other circle: ${s2} − ${c2}.`,
         decoyQuestions: [
-          `What is ${s2} + ${c2}?`,
+          `Are the squares bigger or smaller than the circles?`,
           `What is the first square?`,
         ],
       },

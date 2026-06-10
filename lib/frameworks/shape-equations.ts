@@ -64,7 +64,7 @@ export const shapeEquations: Framework = {
         answer: c,
         hint: `You know ${D} = ${d}. Take it away from ${d + c}.`,
         decoyQuestions: [
-          `What is ${d + c} + ${d}?`,
+          `What is ${D} + ${C}?`,
           `What is ${ST} now?`,
         ],
       },
@@ -75,14 +75,14 @@ export const shapeEquations: Framework = {
         answer: st,
         hint: `You know ${C} = ${c}. Take it away from ${c + st}.`,
         decoyQuestions: [
-          `What is ${c + st} + ${c}?`,
+          `What is ${C} + ${ST}?`,
           `What is ${D} + ${C}?`,
         ],
       },
     ];
 
     return {
-      promptText: `${skin} ${eq1}.  ${eq2}.  ${eq3}.  What is ${ST}?`,
+      promptText: `${skin} ${eq1}. ${eq2}. ${eq3}. What is ${ST}?`,
       figure: { kind: "shapes", equations: [eq1, eq2, eq3] },
       steps,
       finalAsk: `What is ${ST}?`,
