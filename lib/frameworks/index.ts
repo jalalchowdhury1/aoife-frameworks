@@ -1,7 +1,8 @@
 import type { Framework } from "../types";
+import { twoKinds } from "./two-kinds";
 
-// Frameworks are registered here. Phase 4 adds all 18 in family order.
-export const FRAMEWORKS: Framework[] = [];
+// Frameworks are registered here, in family order.
+export const FRAMEWORKS: Framework[] = [twoKinds];
 
 export const byId = (id: string): Framework | undefined =>
   FRAMEWORKS.find((f) => f.id === id);
