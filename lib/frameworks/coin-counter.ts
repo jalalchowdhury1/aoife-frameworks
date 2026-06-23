@@ -32,7 +32,7 @@ export const coinCounter: Framework = {
       {
         id: "vq",
         input: "number",
-        ask: `Each quarter is worth 25¢. What are the ${q} quarter${q === 1 ? "" : "s"} worth? (${q} × 25)`,
+        ask: `Each quarter is worth 25¢. What ${q === 1 ? "is" : "are"} the ${q} quarter${q === 1 ? "" : "s"} worth? (${q} × 25)`,
         answer: vq,
         hint: `${q} quarter${q === 1 ? "" : "s"} at 25¢ each: ${q} × 25.`,
         decoyQuestions: [
@@ -43,7 +43,7 @@ export const coinCounter: Framework = {
       {
         id: "vd",
         input: "number",
-        ask: `Each dime is worth 10¢. What are the ${d} dime${d === 1 ? "" : "s"} worth? (${d} × 10)`,
+        ask: `Each dime is worth 10¢. What ${d === 1 ? "is" : "are"} the ${d} dime${d === 1 ? "" : "s"} worth? (${d} × 10)`,
         answer: vd,
         hint: `${d} dime${d === 1 ? "" : "s"} at 10¢ each: ${d} × 10.`,
         decoyQuestions: [
@@ -54,7 +54,7 @@ export const coinCounter: Framework = {
       {
         id: "vn",
         input: "number",
-        ask: `Each nickel is worth 5¢. What are the ${n} nickel${n === 1 ? "" : "s"} worth? (${n} × 5)`,
+        ask: `Each nickel is worth 5¢. What ${n === 1 ? "is" : "are"} the ${n} nickel${n === 1 ? "" : "s"} worth? (${n} × 5)`,
         answer: vn,
         hint: `${n} nickel${n === 1 ? "" : "s"} at 5¢ each: ${n} × 5.`,
         decoyQuestions: [

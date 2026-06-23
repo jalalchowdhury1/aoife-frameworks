@@ -50,7 +50,7 @@ export const timeZones: Framework = {
       {
         id: "ampm",
         input: "choice",
-        ask: `After ${ahead ? "adding" : "subtracting"} ${offset} hour${offset === 1 ? "" : "s"} from ${fmtClock(aClock)}, is it a.m. or p.m. in ${b}?`,
+        ask: `After ${ahead ? "adding" : "subtracting"} ${offset} hour${offset === 1 ? "" : "s"} ${ahead ? "to" : "from"} ${fmtClock(aClock)}, is it a.m. or p.m. in ${b}?`,
         choices: [
           { label: "a.m.", value: "a.m." },
           { label: "p.m.", value: "p.m." },
