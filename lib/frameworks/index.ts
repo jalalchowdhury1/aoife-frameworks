@@ -23,6 +23,20 @@ import { patternsRules } from "./patterns-rules";
 import { multiStepMoney } from "./multi-step-money";
 import { timeElapsed } from "./time-elapsed";
 import { measureUnits } from "./measure-units";
+// Family 6 · Money & Coins
+import { coinCounter } from "./coin-counter";
+import { fewestCoins } from "./fewest-coins";
+import { makingChange } from "./making-change";
+import { equalBills } from "./equal-bills";
+import { twoCoins } from "./two-coins";
+// Family 7 · Time & Clocks
+import { amPm } from "./am-pm";
+import { clockAdd } from "./clock-add";
+import { clock24 } from "./clock-24";
+import { timeDifference } from "./time-difference";
+import { timeZones } from "./time-zones";
+import { chainedZones } from "./chained-zones";
+import { flightZones } from "./flight-zones";
 
 // Registered in family order — drives the home grid grouping.
 export const FRAMEWORKS: Framework[] = [
@@ -44,6 +58,18 @@ export const FRAMEWORKS: Framework[] = [
   multiStepMoney,
   timeElapsed,
   measureUnits,
+  coinCounter,
+  fewestCoins,
+  makingChange,
+  equalBills,
+  twoCoins,
+  amPm,
+  clockAdd,
+  clock24,
+  timeDifference,
+  timeZones,
+  chainedZones,
+  flightZones,
 ];
 
 export const byId = (id: string): Framework | undefined =>
@@ -55,4 +81,6 @@ export const FAMILIES: string[] = [
   "Reasoning to a Hidden Number",
   "Patterns & Structure",
   "Multi-Step & Real-World",
+  "Money & Coins",
+  "Time & Clocks",
 ];
