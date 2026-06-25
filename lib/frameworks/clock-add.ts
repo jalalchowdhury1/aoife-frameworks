@@ -81,12 +81,16 @@ export const clockAdd: Framework = {
         ask:
           sum > 12
             ? `You passed 12, so take 12 away to read the clock: ${sum} − 12`
-            : `You stayed under 12, so the clock just shows that hour. What hour is it?`,
+            : sum === 12
+              ? `You landed right on 12 o'clock. What hour does the clock show?`
+              : `You stayed under 12, so the clock just shows that hour. What hour is it?`,
         answer: result,
         hint:
           sum > 12
             ? `Past 12, so subtract 12: ${sum} − 12.`
-            : `No wrap needed — it's still ${sum} o'clock.`,
+            : sum === 12
+              ? `Landing on 12 means it's 12 o'clock — noon or midnight.`
+              : `No wrap needed — it's still ${sum} o'clock.`,
         decoyQuestions: [
           "Is the new time a.m. or p.m.?",
           "How many hours did we add?",

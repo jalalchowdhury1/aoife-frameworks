@@ -25,6 +25,10 @@ export const timeDifference: Framework = {
     const b24 = bAhead ? a24 + offset : a24 - offset;
     const aClock = from24(a24);
     const bClock = from24(b24);
+    // Always count from the earlier clock to the later one so the child counts
+    // forward (never backward through the "behind" case).
+    const earlier = bAhead ? aClock : bClock;
+    const later = bAhead ? bClock : aClock;
 
     const steps: Step[] = [
       {
@@ -45,9 +49,9 @@ export const timeDifference: Framework = {
       {
         id: "offset",
         input: "number",
-        ask: `How many hours apart are they? Count the hours from ${fmtClock(aClock)} to ${fmtClock(bClock)} on the clock.`,
+        ask: `How many hours apart are they? Count the hours forward from the earlier clock (${fmtClock(earlier)}) to the later clock (${fmtClock(later)}).`,
         answer: offset,
-        hint: `Count the hours from one clock to the other: it's ${offset} hour${offset === 1 ? "" : "s"}.`,
+        hint: `Count up from ${fmtClock(earlier)} to ${fmtClock(later)}: it's ${offset} hour${offset === 1 ? "" : "s"}.`,
         decoyQuestions: [
           `Is ${b} ahead or behind?`,
           `What time is it in ${b}?`,
