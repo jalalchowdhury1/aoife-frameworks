@@ -73,7 +73,7 @@ export const chainedZones: Framework = {
     return {
       promptText: `It is ${x} hours later in ${b} than in ${a}. It is ${y} hour${y === 1 ? "" : "s"} earlier in ${c} than in ${b}. If it is ${fmtClock(aClock)} in ${a}, what time is it in ${c}?`,
       steps,
-      finalAsk: `What hour does ${c}'s clock show? (and is it a.m. or p.m.?)`,
+      finalAsk: `What hour does ${c}'s clock show?`,
       finalAnswers: [{ label: `o'clock in ${c}`, value: cClock.h12 }],
       data: { a24, x, y, net, result: cClock.h12 },
     };

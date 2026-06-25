@@ -76,7 +76,7 @@ export const flightZones: Framework = {
     return {
       promptText: `A flight from ${dep} to ${arr} takes ${dur} hours. ${arr} is ${off} hour${off === 1 ? "" : "s"} ${later ? "later" : "earlier"} than ${dep}. The flight leaves ${dep} at ${fmtClock(depClock)} — what time is it in ${arr} when it lands?`,
       steps,
-      finalAsk: `What hour does ${arr}'s clock show when it lands? (and is it a.m. or p.m.?)`,
+      finalAsk: `What hour does ${arr}'s clock show when it lands?`,
       finalAnswers: [{ label: `o'clock in ${arr}`, value: landClock.h12 }],
       data: { dep24, dur, off, later: later ? 1 : 0, net, result: landClock.h12 },
     };

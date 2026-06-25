@@ -78,7 +78,7 @@ export const timeZones: Framework = {
     return {
       promptText: `${b} is ${offset} hour${offset === 1 ? "" : "s"} ${ahead ? "ahead of" : "behind"} ${a}. When it is ${fmtClock(aClock)} in ${a}, what time is it in ${b}?`,
       steps,
-      finalAsk: `What hour does ${b}'s clock show? (and is it a.m. or p.m.?)`,
+      finalAsk: `What hour does ${b}'s clock show?`,
       finalAnswers: [{ label: `o'clock in ${b}`, value: bClock.h12 }],
       data: { a24, offset, ahead: ahead ? 1 : 0, result: bClock.h12 },
     };

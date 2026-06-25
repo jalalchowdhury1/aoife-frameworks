@@ -97,7 +97,7 @@ export const clockAdd: Framework = {
     return {
       promptText: `${name} starts ${act} at ${fmtClock(start)} and it lasts ${add} hour${add === 1 ? "" : "s"}. What time is it when it ends?`,
       steps,
-      finalAsk: "What hour does the clock show when it ends? (and is it a.m. or p.m.?)",
+      finalAsk: "What hour does the clock show when it ends?",
       finalAnswers: [{ label: "o'clock", value: result }],
       data: { h12, add, sum, result, flip: flip ? 1 : 0 },
     };
