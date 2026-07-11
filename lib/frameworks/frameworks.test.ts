@@ -2,6 +2,10 @@ import { describe, it, expect } from "vitest";
 import { FRAMEWORKS } from "./index";
 import { makeRng } from "../rng";
 
+// Steps whose answers are numbers: the plain numpad plus the two interactive
+// Time & Clocks inputs (she submits an hour / a hop count — same semantics).
+const NUMERIC = new Set(["number", "clock-set", "line-hop"]);
+
 describe("every framework generator", () => {
   for (const fw of FRAMEWORKS) {
     it(`${fw.id}: 500 solvable, consistent problems`, () => {
@@ -12,7 +16,7 @@ describe("every framework generator", () => {
         expect(p.promptText.length).toBeGreaterThan(0);
         expect(p.finalAsk.length).toBeGreaterThan(0);
         for (const s of p.steps) {
-          if (s.input === "number") {
+          if (NUMERIC.has(s.input)) {
             const v = s.answer as number;
             expect(Number.isInteger(v) && v >= 0, `${fw.id} step ${s.id}=${v}`).toBe(true);
           }
@@ -32,7 +36,7 @@ describe("every framework generator", () => {
           // wrong question rewards/teaches the wrong arithmetic. Guards the whole
           // "decoy-correct" class found in the 2026-06-10 audit.
           const realValues = new Set<number>([
-            ...(s.input === "number" ? [s.answer as number] : []),
+            ...(NUMERIC.has(s.input) ? [s.answer as number] : []),
             ...p.finalAnswers.map((fa) => fa.value),
           ]);
           for (const decoy of s.decoyQuestions) {
@@ -56,7 +60,7 @@ describe("every framework generator", () => {
         // finalAnswer.value has to be the answer of some number step (otherwise
         // the child is walked through a script that never computes the answer).
         const numberStepAnswers = new Set(
-          p.steps.filter((s) => s.input === "number").map((s) => s.answer as number),
+          p.steps.filter((s) => NUMERIC.has(s.input)).map((s) => s.answer as number),
         );
         for (const fa of p.finalAnswers) {
           expect(
