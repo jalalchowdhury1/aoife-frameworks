@@ -36,3 +36,29 @@ export function fmtClock(c: Clock): string {
 export function crossesTwelve(c: Clock, d: number): boolean {
   return c.ampm !== addHours(c, d).ampm;
 }
+
+// [[7|am]] chip token — the ONLY way times appear in Time & Clocks text.
+// Rendered as a gold/purple chip by lib/engine/rich.tsx; chipText() is the
+// plain-text fallback for tests and non-engine contexts.
+export function chip(c: Clock): string {
+  return `[[${c.h12}|${c.ampm === "a.m." ? "am" : "pm"}]]`;
+}
+
+export const CHIP_RE = /\[\[(\d{1,2})\|(am|pm)\]\]/g;
+
+export function chipText(text: string): string {
+  return text.replace(CHIP_RE, (_, h, half) =>
+    half === "am" ? `${h}:00 ☀️ a.m.` : `${h}:00 🌙 p.m.`,
+  );
+}
+
+// Hours Aoife already knows — the day-line's landmarks (hour-of-day 0..23).
+export const ANCHORS: Record<number, { icon: string; label: string }> = {
+  7: { icon: "🌅", label: "wakes up" },
+  8: { icon: "🍳", label: "eats breakfast" },
+  9: { icon: "🎒", label: "starts school" },
+  12: { icon: "🥪", label: "eats lunch" },
+  16: { icon: "🛝", label: "plays outside" },
+  18: { icon: "🍽️", label: "eats dinner" },
+  20: { icon: "🛏️", label: "goes to bed" },
+};
