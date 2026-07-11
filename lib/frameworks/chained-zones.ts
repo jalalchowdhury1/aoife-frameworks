@@ -1,18 +1,17 @@
 import type { Framework, Problem, Step } from "../types";
 import type { Rng } from "../rng";
-import { to24, addHours, fmtClock, type AmPm } from "../clock";
+import { to24, addHours, type AmPm } from "../clock";
+import { warmupDirection, CITIES, halfChoices, c, plural } from "./time-shared";
 
-const CITIES = ["Honolulu", "Denver", "New York", "London", "Moscow", "Singapore", "Auckland", "Berlin"];
-
-// Q11: two offsets across three cities. Combine the two hops into ONE offset
-// from the first city to the last, then convert the time just once.
+// Day 8 · 🌍 Around the World — "Two Jumps, One Big Jump"
+// ONE new idea: two hops (x forward, y back) squish into a single jump of
+// x − y. After that it's exactly Day 7.
 export const chainedZones: Framework = {
   id: "chained-zones",
-  title: "Chained Time Zones",
+  title: "Two Jumps, One Big Jump",
   emoji: "🧭",
   family: "Time & Clocks",
-  blurb:
-    "Three cities, two offsets — add them into a single jump, then convert the time once.",
+  blurb: "Hop forward, hop back — squish both into ONE jump, then it's easy.",
   source: "photo",
   invariant: (d) => {
     const r24 = (((d.a24 + d.net) % 24) + 24) % 24;
@@ -20,10 +19,10 @@ export const chainedZones: Framework = {
     return d.net === d.x - d.y && d.net >= 1 && d.result === h;
   },
   generate(rng: Rng): Problem {
-    const [a, b, c] = rng.shuffle(CITIES).slice(0, 3);
-    const x = rng.int(2, 11); // B is x hours LATER than A
-    const y = rng.int(1, x - 1); // C is y hours EARLIER than B
-    const net = x - y; // so C is net hours later than A (1..10)
+    const [a, b, cc] = rng.shuffle([...CITIES]).slice(0, 3);
+    const x = rng.int(2, 6); // B is x hours ahead of A
+    const y = rng.int(1, x - 1); // C is y hours back from B
+    const net = x - y; // C is net hours ahead of A (1..5)
     const ampm: AmPm = rng.pick(["a.m.", "p.m."]);
     const h12 = rng.int(1, 12);
     const aClock = { h12, ampm };
@@ -31,50 +30,63 @@ export const chainedZones: Framework = {
     const cClock = addHours(aClock, net);
 
     const steps: Step[] = [
+      warmupDirection(rng),
       {
         id: "net",
         input: "number",
-        ask: `${b} is ${x} hours ahead of ${a}, but ${c} is ${y} hour${y === 1 ? "" : "s"} back from ${b}. How many hours ahead of ${a} is ${c}? (${x} − ${y})`,
+        ask: `${b} is ${x} ${plural(x)} ahead of ${a}, and ${cc} is ${y} ${plural(y)} BACK from ${b}. Hop ${x} forward then ${y} back — how big is the ONE jump from ${a} to ${cc}?`,
         answer: net,
-        hint: `Go ${x} hours forward, then ${y} back: ${x} − ${y}.`,
+        hint: `Try it on the day-line: ${x} hops forward, ${y} hops back — you end up ${net} ahead. (That's ${x} − ${y}.)`,
         decoyQuestions: [
           `What time is it in ${b}?`,
-          `Is ${c} ahead of or behind ${a}?`,
+          "How many hours are in a whole day?",
         ],
       },
       {
-        id: "ampm",
+        id: "half",
         input: "choice",
-        ask: `Adding ${net} hour${net === 1 ? "" : "s"} to ${fmtClock(aClock)}, is it a.m. or p.m. in ${c}?`,
-        choices: [
-          { label: "a.m.", value: "a.m." },
-          { label: "p.m.", value: "p.m." },
-        ],
+        ask: `After that jump, is it the ☀️ half or the 🌙 half in ${cc}?`,
+        choices: halfChoices,
         answer: cClock.ampm,
-        hint: `${a} is ${fmtClock(aClock)}, and if you cross 12 (noon or midnight) the a.m./p.m. flips.`,
+        hint:
+          cClock.ampm === ampm
+            ? `The jump never crosses 🥪 lunch or 💤 midnight, so the half stays the same as ${c(h12, ampm)}.`
+            : `The jump steps across ${ampm === "a.m." ? "🥪 lunch" : "💤 midnight"} — the half flips, just like Day 3.`,
         decoyQuestions: [
-          `How far ahead of ${a} is ${c}?`,
+          `How big is the jump from ${a} to ${cc}?`,
           `What time is it in ${b}?`,
         ],
       },
       {
-        id: "result",
-        input: "number",
-        ask: `Count ${net} hour${net === 1 ? "" : "s"} forward from ${fmtClock(aClock)} — what hour does ${c}'s clock show?`,
+        id: "land",
+        input: "clock-set",
+        inputSpec: {
+          kind: "clockFace",
+          hour: cClock.h12,
+          ampm: cClock.ampm === "a.m." ? "am" : "pm",
+          ghostHour: h12,
+          hops: net,
+        },
+        ask: `Hop the hand ${net} ${plural(net)} forward from ${c(h12, ampm)}. What hour does ${cc}'s clock show?`,
         answer: cClock.h12,
-        hint: `Move ${net} hours forward, taking 12 away if you pass it. It lands on ${cClock.h12} o'clock.`,
+        hint: `Count the taps — after 12 comes 1, all by itself.`,
         decoyQuestions: [
-          `Is it a.m. or p.m. in ${c}?`,
-          `How far ahead of ${a} is ${c}?`,
+          `Is it the ☀️ half or the 🌙 half in ${cc}?`,
+          `What time is it in ${b}?`,
         ],
       },
     ];
 
     return {
-      promptText: `It is ${x} hours later in ${b} than in ${a}. It is ${y} hour${y === 1 ? "" : "s"} earlier in ${c} than in ${b}. If it is ${fmtClock(aClock)} in ${a}, what time is it in ${c}?`,
+      promptText: `${b} is ${x} ${plural(x)} ahead of ${a}. ${cc} is ${y} ${plural(y)} back from ${b}. When it is ${c(h12, ampm)} in ${a}, what time is it in ${cc}?`,
+      figure: {
+        kind: "clockFace",
+        hour: h12,
+        ampm: ampm === "a.m." ? "am" : "pm",
+      },
       steps,
-      finalAsk: `What hour does ${c}'s clock show?`,
-      finalAnswers: [{ label: `o'clock in ${c}`, value: cClock.h12 }],
+      finalAsk: `What hour does ${cc}'s clock show?`,
+      finalAnswers: [{ label: `o'clock in ${cc}`, value: cClock.h12 }],
       data: { a24, x, y, net, result: cClock.h12 },
     };
   },

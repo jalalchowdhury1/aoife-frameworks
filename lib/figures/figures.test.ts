@@ -162,6 +162,77 @@ describe("figure data matches problem data", () => {
     });
   });
 
+  it("clock-add: clock figure shows the start; input hops to the result", () => {
+    each("clock-add", (p) => {
+      const f = p.figure!;
+      expect(f.kind).toBe("clockFace");
+      expect(f.hour).toBe(p.data.h12);
+      const spec = p.steps[p.steps.length - 1].inputSpec!;
+      expect(spec.ghostHour).toBe(p.data.h12);
+      expect(spec.hour).toBe(p.data.result);
+      expect(spec.hops).toBe(p.data.add);
+    });
+  });
+
+  it("clock-24: double day-line highlights the 24-hour answer cell", () => {
+    each("clock-24", (p) => {
+      const f = p.figure!;
+      expect(f.kind).toBe("dayLine");
+      expect(f.variant).toBe("double");
+      expect(f.highlight).toBe(p.data.result);
+      const spec = p.steps[p.steps.length - 1].inputSpec!;
+      expect(spec.row).toBe("h24");
+      expect(spec.start).toBe(p.data.isPm === 1 ? 12 : 0);
+      expect(spec.hops).toBe(p.data.h12);
+    });
+  });
+
+  it("time-difference: stacked day-lines put NOW at both cities' hours", () => {
+    each("time-difference", (p) => {
+      const f = p.figure!;
+      expect(f.kind).toBe("dayLine");
+      expect(f.variant).toBe("stacked");
+      expect(f.nowA).toBe(p.data.a24);
+      expect((f.nowA as number) + (f.offsetB as number)).toBe(p.data.b24);
+      const spec = p.steps[p.steps.length - 1].inputSpec!;
+      expect(spec.mode).toBe("count");
+      expect(spec.hops).toBe(p.data.offset);
+      expect(spec.start).toBe(Math.min(p.data.a24, p.data.b24));
+    });
+  });
+
+  it("time-zones: hop figure/input matches offset, direction, landing", () => {
+    each("time-zones", (p) => {
+      const spec = p.steps[p.steps.length - 1].inputSpec!;
+      const dir = p.data.ahead === 1 ? 1 : -1;
+      expect(spec.hops).toBe(p.data.offset);
+      if (p.data.fig === 0) {
+        expect(spec.kind).toBe("dayLine");
+        expect(spec.start).toBe(p.data.a24);
+        expect(spec.dir).toBe(dir);
+        const land = (spec.start as number) + dir * (spec.hops as number);
+        expect(land).toBeGreaterThanOrEqual(0);
+        expect(land).toBeLessThanOrEqual(23);
+        expect(land % 12 === 0 ? 12 : land % 12).toBe(p.data.result);
+      } else {
+        expect(spec.kind).toBe("clockFace");
+        expect(spec.hour).toBe(p.data.result);
+        expect(spec.dir).toBe(dir);
+      }
+    });
+  });
+
+  it("chained-zones + flight-zones: clock input hops the NET jump to the result", () => {
+    for (const id of ["chained-zones", "flight-zones"]) {
+      each(id, (p) => {
+        const spec = p.steps[p.steps.length - 1].inputSpec!;
+        expect(spec.kind).toBe("clockFace");
+        expect(spec.hops).toBe(p.data.net);
+        expect(spec.hour).toBe(p.data.result);
+      });
+    }
+  });
+
   it("shape-equations: equation strings match the secret values", () => {
     each("shape-equations", (p) => {
       const eqs = p.figure!.equations as string[];

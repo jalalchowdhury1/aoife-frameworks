@@ -1,86 +1,121 @@
 import type { Framework, Problem, Step } from "../types";
 import type { Rng } from "../rng";
-import { to24, addHours, fmtClock, type AmPm } from "../clock";
+import { to24, addHours, type AmPm } from "../clock";
+import { warmupAhead, CITIES, halfChoices, c, plural } from "./time-shared";
 
-const CITIES = ["Honolulu", "Denver", "New York", "London", "Moscow", "Singapore", "Auckland", "Seattle"];
-
-// Q8 (part 2): given the offset and direction, convert a specific time from one
-// city to another. Reuses the Clock Add wrap mechanic (ahead = add, behind = subtract).
+// Day 7 · 🌍 Around the World — "Jump to Another City"
+// Ahead = further along their day = hop FORWARD; behind = hop BACK. Then it's
+// just Day 4's counting. The landing input is a clock (always safe across
+// midnight) or a day-line hop when the hop stays inside the strip.
 export const timeZones: Framework = {
   id: "time-zones",
-  title: "Convert Across Time Zones",
+  title: "Jump to Another City",
   emoji: "🌎",
   family: "Time & Clocks",
-  blurb:
-    "Ahead means add the hours, behind means subtract — then read the new clock, watching for a.m./p.m.",
+  blurb: "Ahead = hop forward, behind = hop back — then just count the hops.",
   source: "photo",
   invariant: (d) => {
-    const r24 = (((d.a24 + (d.ahead ? d.offset : -d.offset)) % 24) + 24) % 24;
+    const r24 = (((d.a24 + (d.ahead === 1 ? d.offset : -d.offset)) % 24) + 24) % 24;
     const h = r24 % 12 === 0 ? 12 : r24 % 12;
-    return d.result === h && d.offset >= 1 && d.offset <= 11;
+    return d.result === h && d.offset >= 1 && d.offset <= 6 && (d.fig === 0 || d.fig === 1);
   },
   generate(rng: Rng): Problem {
-    const [a, b] = rng.shuffle(CITIES).slice(0, 2);
-    const offset = rng.int(1, 11);
+    const [a, b] = rng.shuffle([...CITIES]).slice(0, 2);
+    const offset = rng.int(1, 6);
     const ahead = rng.pick([true, false]);
     const ampm: AmPm = rng.pick(["a.m.", "p.m."]);
     const h12 = rng.int(1, 12);
     const aClock = { h12, ampm };
     const a24 = to24(h12, ampm);
     const bClock = addHours(aClock, ahead ? offset : -offset);
+    const land24raw = a24 + (ahead ? offset : -offset);
+    const wraps = land24raw < 0 || land24raw > 23;
+    const fig = wraps ? 1 : rng.pick([0, 1]); // 0 = day-line, 1 = clock
+
+    const inputSpec =
+      fig === 0
+        ? {
+            kind: "dayLine",
+            hopFrom: a24,
+            hopTo: land24raw,
+            start: a24,
+            dir: ahead ? 1 : -1,
+            hops: offset,
+            mode: "land",
+          }
+        : {
+            kind: "clockFace",
+            hour: bClock.h12,
+            ampm: bClock.ampm === "a.m." ? "am" : "pm",
+            ghostHour: h12,
+            dir: ahead ? 1 : -1,
+            hops: offset,
+          };
 
     const steps: Step[] = [
+      warmupAhead(rng),
       {
         id: "dir",
         input: "choice",
-        ask: `${b} is ${offset} hour${offset === 1 ? "" : "s"} ${ahead ? "ahead of" : "behind"} ${a}. Do we ADD or SUBTRACT those hours?`,
+        ask: `${b}'s clocks are ${offset} ${plural(offset)} ${ahead ? "AHEAD of" : "BEHIND"} ${a}'s. Which way do we hop to find ${b}'s time?`,
         choices: [
-          { label: "Add the hours", value: "add" },
-          { label: "Subtract the hours", value: "subtract" },
+          { label: "⏩ forward (later)", value: "forward" },
+          { label: "⏪ back (earlier)", value: "back" },
         ],
-        answer: ahead ? "add" : "subtract",
+        answer: ahead ? "forward" : "back",
         hint: ahead
-          ? "Ahead means later, so we ADD the hours."
-          : "Behind means earlier, so we SUBTRACT the hours.",
+          ? `Ahead = further along their day = hop forward.`
+          : `Behind = earlier in their day = hop back.`,
         decoyQuestions: [
           `What time is it in ${a}?`,
-          "How many hours apart are the cities?",
+          "How many hours are in a whole day?",
         ],
       },
       {
-        id: "ampm",
+        id: "half",
         input: "choice",
-        ask: `After ${ahead ? "adding" : "subtracting"} ${offset} hour${offset === 1 ? "" : "s"} ${ahead ? "to" : "from"} ${fmtClock(aClock)}, is it a.m. or p.m. in ${b}?`,
-        choices: [
-          { label: "a.m.", value: "a.m." },
-          { label: "p.m.", value: "p.m." },
-        ],
+        ask: `After the hop, is it the ☀️ half or the 🌙 half in ${b}?`,
+        choices: halfChoices,
         answer: bClock.ampm,
-        hint: `${a} is ${fmtClock(aClock)}, and if you cross 12 (noon or midnight) the a.m./p.m. flips.`,
+        hint:
+          bClock.ampm === ampm
+            ? `The hop never crosses 🥪 lunch or 💤 midnight, so the half stays the same as ${c(h12, ampm)}.`
+            : `The hop steps across ${ampm === "a.m." ? (ahead ? "🥪 lunch" : "💤 midnight") : ahead ? "💤 midnight" : "🥪 lunch"} — watch the color change: the half flips.`,
         decoyQuestions: [
-          "Do we add or subtract the hours?",
+          "Which way do we hop?",
           `What time is it in ${a}?`,
         ],
       },
       {
-        id: "result",
-        input: "number",
-        ask: `Count ${offset} hour${offset === 1 ? "" : "s"} ${ahead ? "forward" : "back"} from ${fmtClock(aClock)} — what hour does ${b}'s clock show?`,
+        id: "land",
+        input: fig === 0 ? "line-hop" : "clock-set",
+        inputSpec,
+        ask: `Hop ${offset} ${plural(offset)} ${ahead ? "forward ⏩" : "back ⏪"} from ${c(h12, ampm)}. What hour does ${b}'s clock show?`,
         answer: bClock.h12,
-        hint: `Move ${offset} hour${offset === 1 ? "" : "s"} ${ahead ? "forward" : "back"} on the clock, taking 12 away if you pass it. It lands on ${bClock.h12} o'clock.`,
+        hint: `Count each hop out loud — the ${fig === 0 ? "day-line" : "clock"} does the tricky part by itself.`,
         decoyQuestions: [
-          "Is it a.m. or p.m. now?",
-          "Do we add or subtract the hours?",
+          "Which way do we hop?",
+          `Is it the ☀️ half or the 🌙 half in ${b}?`,
         ],
       },
     ];
 
     return {
-      promptText: `${b} is ${offset} hour${offset === 1 ? "" : "s"} ${ahead ? "ahead of" : "behind"} ${a}. When it is ${fmtClock(aClock)} in ${a}, what time is it in ${b}?`,
+      promptText: `${b}'s clocks are ${offset} ${plural(offset)} ${ahead ? "AHEAD of" : "BEHIND"} ${a}'s. When it is ${c(h12, ampm)} in ${a}, what time is it in ${b}?`,
+      figure:
+        fig === 0
+          ? { kind: "dayLine", hopFrom: a24, hopTo: land24raw }
+          : { kind: "clockFace", hour: h12, ampm: ampm === "a.m." ? "am" : "pm" },
       steps,
       finalAsk: `What hour does ${b}'s clock show?`,
       finalAnswers: [{ label: `o'clock in ${b}`, value: bClock.h12 }],
-      data: { a24, offset, ahead: ahead ? 1 : 0, result: bClock.h12 },
+      data: {
+        a24,
+        offset,
+        ahead: ahead ? 1 : 0,
+        result: bClock.h12,
+        fig,
+      },
     };
   },
 };

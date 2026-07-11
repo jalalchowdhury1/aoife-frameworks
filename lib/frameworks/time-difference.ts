@@ -1,69 +1,95 @@
 import type { Framework, Problem, Step } from "../types";
 import type { Rng } from "../rng";
-import { from24, fmtClock } from "../clock";
+import { from24 } from "../clock";
+import { warmupRead24, CITIES, c, plural } from "./time-shared";
 
-const CITIES = ["Honolulu", "Denver", "New York", "London", "Moscow", "Singapore", "Auckland", "Seattle"];
-
-// Q8 (part 1): given the SAME moment shown on two cities' clocks, find how many
-// hours apart they are and which one is ahead.
+// Day 6 · 🌍 Around the World — "Who's Ahead?"
+// One moment, two clocks. The NOW line crosses both cities' day-lines — she
+// counts the hops between the marks. "Ahead" = further along in their day,
+// like being on a later page of the same book. Offsets stay small (1–5):
+// the counting idea is what's new today.
 export const timeDifference: Framework = {
   id: "time-difference",
-  title: "Find the Time Difference",
+  title: "Who's Ahead?",
   emoji: "🌍",
   family: "Time & Clocks",
-  blurb:
-    "Two cities' clocks at the same moment — count the hours between them, and say which is ahead.",
+  blurb: "Two clocks, one moment — count the hops between them. The later one is ahead.",
   source: "photo",
   invariant: (d) =>
-    d.offset === Math.abs(d.b24 - d.a24) && d.offset >= 1 && d.offset <= 11,
+    d.offset === Math.abs(d.b24 - d.a24) &&
+    d.offset >= 1 &&
+    d.offset <= 5 &&
+    d.a24 >= 0 &&
+    d.b24 >= 0 &&
+    d.a24 <= 23 &&
+    d.b24 <= 23,
   generate(rng: Rng): Problem {
-    const [a, b] = rng.shuffle(CITIES).slice(0, 2);
-    const offset = rng.int(1, 11);
+    const [a, b] = rng.shuffle([...CITIES]).slice(0, 2);
+    const offset = rng.int(1, 5);
     const bAhead = rng.pick([true, false]);
-    // Keep both times on the same day (no midnight wrap) so the child can count.
-    const a24 = bAhead ? rng.int(0, 23 - offset) : rng.int(offset, 23);
+    // Same calendar day on both clocks — no midnight wrap, so she can count.
+    const a24 = bAhead ? rng.int(7, 23 - offset) : rng.int(7 + offset, 23);
     const b24 = bAhead ? a24 + offset : a24 - offset;
     const aClock = from24(a24);
     const bClock = from24(b24);
-    // Always count from the earlier clock to the later one so the child counts
-    // forward (never backward through the "behind" case).
-    const earlier = bAhead ? aClock : bClock;
-    const later = bAhead ? bClock : aClock;
+    const earlier24 = Math.min(a24, b24);
+    const earlier = from24(earlier24);
+    const later = from24(Math.max(a24, b24));
 
     const steps: Step[] = [
+      warmupRead24(rng),
       {
-        id: "dir",
+        id: "ahead",
         input: "choice",
-        ask: `Look at the two clocks. Is ${b} ahead of or behind ${a}?`,
+        ask: `At the SAME moment, ${a}'s clock says ${c(aClock.h12, aClock.ampm)} and ${b}'s says ${c(bClock.h12, bClock.ampm)}. Which city is AHEAD?`,
         choices: [
-          { label: `${b} is ahead`, value: "ahead" },
-          { label: `${b} is behind`, value: "behind" },
+          { label: `${a} is ahead`, value: "A" },
+          { label: `${b} is ahead`, value: "B" },
         ],
-        answer: bAhead ? "ahead" : "behind",
-        hint: `${a} shows ${fmtClock(aClock)} and ${b} shows ${fmtClock(bClock)}, so the city with the LATER time is ahead.`,
+        answer: bAhead ? "B" : "A",
+        hint: `Ahead means further along in the day — like a later page of the same book. ${bAhead ? b : a}'s clock shows the LATER time, so their day is further along.`,
         decoyQuestions: [
-          `What time is it in ${a}?`,
           "How many hours apart are the cities?",
+          "How many hours are in a whole day?",
         ],
       },
       {
-        id: "offset",
-        input: "number",
-        ask: `How many hours apart are they? Count the hours forward from the earlier clock (${fmtClock(earlier)}) to the later clock (${fmtClock(later)}).`,
+        id: "gap",
+        input: "line-hop",
+        inputSpec: {
+          kind: "dayLine",
+          variant: "stacked",
+          nowA: a24,
+          offsetB: b24 - a24,
+          cityA: a,
+          cityB: b,
+          start: earlier24,
+          hops: offset,
+          mode: "count",
+        },
+        ask: `Count the hops from the earlier mark (${c(earlier.h12, earlier.ampm)}) to the later one (${c(later.h12, later.ampm)}). How many hours apart are they?`,
         answer: offset,
-        hint: `Count up from ${fmtClock(earlier)} to ${fmtClock(later)}: it's ${offset} hour${offset === 1 ? "" : "s"}.`,
+        hint: `Start on ${c(earlier.h12, earlier.ampm)} and hop toward ${c(later.h12, later.ampm)}, counting each hop out loud — the count is your answer.`,
         decoyQuestions: [
-          `Is ${b} ahead or behind?`,
-          `What time is it in ${b}?`,
+          `Which city is ahead?`,
+          "How many hours are in a whole day?",
         ],
       },
     ];
 
     return {
-      promptText: `At the same moment, it is ${fmtClock(aClock)} in ${a} and ${fmtClock(bClock)} in ${b}. How many hours apart are the two cities, and is ${b} ahead of or behind ${a}?`,
+      promptText: `It's one single moment in time ⏱️ — but ${a}'s clock says ${c(aClock.h12, aClock.ampm)} while ${b}'s clock says ${c(bClock.h12, bClock.ampm)}. How many hours apart are the two cities?`,
+      figure: {
+        kind: "dayLine",
+        variant: "stacked",
+        nowA: a24,
+        offsetB: b24 - a24,
+        cityA: a,
+        cityB: b,
+      },
       steps,
       finalAsk: "How many hours apart are the two cities?",
-      finalAnswers: [{ label: "hours apart", value: offset }],
+      finalAnswers: [{ label: `${plural(offset)} apart`, value: offset }],
       data: { a24, b24, offset, ahead: bAhead ? 1 : 0 },
     };
   },
