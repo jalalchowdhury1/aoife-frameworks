@@ -5,6 +5,7 @@ import type { Problem, Stage, Step } from "../types";
 import { makeRng } from "../rng";
 import { Numpad } from "./Numpad";
 import { ChoicePad } from "./ChoicePad";
+import { renderRich } from "./rich";
 
 interface RunnerProps {
   stage: Stage;
@@ -130,16 +131,16 @@ function StepRunner({
       {steps.slice(0, idx).map((s, i) => (
         <div key={s.id} className="step-done px-4 py-2 flex items-center gap-2 text-sm">
           <span>✅</span>
-          <span className="flex-1 text-gray-600">{s.ask}</span>
-          <b className="text-green-700">{recorded[i]}</b>
+          <span className="flex-1 text-gray-600">{renderRich(s.ask)}</span>
+          <b className="text-green-700">{renderRich(recorded[i])}</b>
         </div>
       ))}
 
       {/* Active step */}
       {stage === "watch" ? (
         <div className="step-active p-4">
-          <div className="text-lg font-bold text-purple-800 mb-1">{step.ask}</div>
-          <div className="text-2xl font-bold text-pink-600">{displayAnswer(step)}</div>
+          <div className="text-lg font-bold text-purple-800 mb-1">{renderRich(step.ask)}</div>
+          <div className="text-2xl font-bold text-pink-600">{renderRich(displayAnswer(step))}</div>
           <button
             type="button"
             className="mt-3 bg-purple-500 text-white rounded-xl px-5 py-2 font-bold active:scale-95"
@@ -162,12 +163,12 @@ function StepRunner({
         </div>
       ) : (
         <div className={`step-active p-4 ${feedback === "wrong" ? "animate-shake" : ""}`}>
-          <div className="text-lg font-bold text-purple-800 mb-3">{step.ask}</div>
+          <div className="text-lg font-bold text-purple-800 mb-3">{renderRich(step.ask)}</div>
 
           {feedback === "revealed" ? (
             <div className="text-center">
               <div className="text-sm text-gray-500">The answer is</div>
-              <div className="text-3xl font-bold text-purple-600">{displayAnswer(step)}</div>
+              <div className="text-3xl font-bold text-purple-600">{renderRich(displayAnswer(step))}</div>
             </div>
           ) : step.input === "choice" && step.choices ? (
             <ChoicePad choices={step.choices} onPick={checkAnswer} disabled={locked} />
@@ -193,7 +194,7 @@ function StepRunner({
           )}
           {feedback === "wrong" && (
             <div className="mt-2 text-center text-pink-600 font-semibold">
-              💡 {step.hint}
+              💡 {renderRich(step.hint)}
             </div>
           )}
         </div>
@@ -255,12 +256,12 @@ function SoloRunner({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="text-center text-xl font-bold text-purple-800">{problem.finalAsk}</div>
+      <div className="text-center text-xl font-bold text-purple-800">{renderRich(problem.finalAsk)}</div>
 
       <div className="flex justify-center gap-3 flex-wrap">
         {finals.map((f, i) => (
           <div key={i} className="text-center">
-            <div className="text-sm text-purple-500">{f.label}</div>
+            <div className="text-sm text-purple-500">{renderRich(f.label)}</div>
             <div
               className={`min-w-20 h-14 px-3 rounded-xl border-4 flex items-center justify-center text-2xl font-bold ${
                 i < filled.length

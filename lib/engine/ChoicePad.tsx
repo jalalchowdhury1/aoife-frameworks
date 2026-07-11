@@ -1,6 +1,7 @@
 "use client";
 
 import type { Choice } from "../types";
+import { renderRich } from "./rich";
 
 interface ChoicePadProps {
   choices: Choice[];
@@ -21,7 +22,7 @@ export function ChoicePad({ choices, onPick, variant = "normal", disabled }: Cho
           onClick={() => onPick(c.value)}
           disabled={disabled}
         >
-          {c.label}
+          {renderRich(c.label)}
         </button>
       ))}
     </div>

@@ -13,6 +13,7 @@ import {
   type Progress,
 } from "../progress";
 import { Figure } from "../figures/Figure";
+import { renderRich } from "./rich";
 import { StageRunner } from "./StageRunner";
 
 function startStageFor(progress: Progress, id: string): Stage {
@@ -124,7 +125,7 @@ export function StageEngine({ framework }: { framework: Framework }) {
 
           {/* Problem statement + figure shown in EVERY stage, including Solo. */}
           <div className="bg-white border-4 border-pink-200 rounded-2xl p-4 mb-3 text-lg text-gray-800 leading-snug">
-            {problem.promptText}
+            {renderRich(problem.promptText)}
           </div>
           <Figure spec={problem.figure} />
 
