@@ -22,10 +22,6 @@ function cellFill(h: number): string {
   return "#fef3c7"; // daylight
 }
 
-function isNight(h: number): boolean {
-  return h <= 5 || h >= 20;
-}
-
 function h12Label(h: number): number {
   return h % 12 === 0 ? 12 : h % 12;
 }
