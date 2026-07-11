@@ -21,12 +21,14 @@ export function OneClock({
   ghostHour,
   label,
   sweep,
+  angleOverride,
 }: {
   hour: number;
   ampm: "am" | "pm";
   ghostHour?: number;
   label?: string;
   sweep?: boolean; // CSS-transition the hand when `hour` changes (inputs/watch demo)
+  angleOverride?: number; // cumulative degrees — keeps the sweep going FORWARD past 12
 }) {
   const am = ampm === "am";
   return (
@@ -69,7 +71,8 @@ export function OneClock({
             transform={`rotate(${handAngle(ghostHour)} ${C} ${C})`}
           />
         )}
-        {/* hour hand */}
+        {/* hour hand — CSS transform (not the SVG attribute) so the sweep can
+            animate, with a cumulative angle so it always sweeps FORWARD past 12 */}
         <line
           x1={C}
           y1={C}
@@ -78,8 +81,12 @@ export function OneClock({
           stroke={am ? "#d97706" : "#7e22ce"}
           strokeWidth={6}
           strokeLinecap="round"
-          transform={`rotate(${handAngle(hour)} ${C} ${C})`}
-          style={sweep ? { transition: "transform 500ms ease-in-out" } : undefined}
+          style={{
+            transform: `rotate(${angleOverride ?? handAngle(hour)}deg)`,
+            transformOrigin: `${C}px ${C}px`,
+            transformBox: "view-box",
+            transition: sweep ? "transform 500ms ease-in-out" : undefined,
+          }}
         />
         <circle cx={C} cy={C} r={5} fill={am ? "#d97706" : "#7e22ce"} />
         {label && (

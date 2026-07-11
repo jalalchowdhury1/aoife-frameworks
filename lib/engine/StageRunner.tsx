@@ -5,6 +5,8 @@ import type { Problem, Stage, Step } from "../types";
 import { makeRng } from "../rng";
 import { Numpad } from "./Numpad";
 import { ChoicePad } from "./ChoicePad";
+import { ClockInput } from "./ClockInput";
+import { DayLineInput } from "./DayLineInput";
 import { renderRich } from "./rich";
 
 interface RunnerProps {
@@ -56,7 +58,9 @@ function StepRunner({
   const [recorded, setRecorded] = useState<string[]>([]); // her answers for completed steps
   const [entry, setEntry] = useState("");
   const [tries, setTries] = useState(0);
-  const [qChosen, setQChosen] = useState(stage !== "lead"); // lead: must choose question first
+  const [qChosen, setQChosen] = useState(
+    stage !== "lead" || !!problem.steps[0]?.warmup, // lead: choose the question first — except warm-ups
+  );
   const [feedback, setFeedback] = useState<Feedback>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -83,7 +87,7 @@ function StepRunner({
     setFeedback(null);
     setEntry("");
     setTries(0);
-    setQChosen(stage !== "lead");
+    setQChosen(stage !== "lead" || !!steps[idx + 1]?.warmup);
     if (idx + 1 >= steps.length) {
       onComplete(stage);
     } else {
@@ -98,9 +102,9 @@ function StepRunner({
 
   const checkAnswer = (val: number | string) => {
     const ok =
-      step.input === "number"
-        ? Number(val) === Number(step.answer)
-        : val === step.answer;
+      step.input === "choice"
+        ? val === step.answer
+        : Number(val) === Number(step.answer); // number, clock-set, line-hop
     if (ok) {
       handleCorrect();
     } else if (tries === 0) {
@@ -139,7 +143,13 @@ function StepRunner({
       {/* Active step */}
       {stage === "watch" ? (
         <div className="step-active p-4">
+          {step.warmup && <WarmupChip />}
           <div className="text-lg font-bold text-purple-800 mb-1">{renderRich(step.ask)}</div>
+          {step.input === "clock-set" && step.inputSpec ? (
+            <ClockInput key={step.id} spec={step.inputSpec} onSubmit={() => {}} demo />
+          ) : step.input === "line-hop" && step.inputSpec ? (
+            <DayLineInput key={step.id} spec={step.inputSpec} onSubmit={() => {}} demo />
+          ) : null}
           <div className="text-2xl font-bold text-pink-600">{renderRich(displayAnswer(step))}</div>
           <button
             type="button"
@@ -163,6 +173,7 @@ function StepRunner({
         </div>
       ) : (
         <div className={`step-active p-4 ${feedback === "wrong" ? "animate-shake" : ""}`}>
+          {step.warmup && <WarmupChip />}
           <div className="text-lg font-bold text-purple-800 mb-3">{renderRich(step.ask)}</div>
 
           {feedback === "revealed" ? (
@@ -172,6 +183,10 @@ function StepRunner({
             </div>
           ) : step.input === "choice" && step.choices ? (
             <ChoicePad choices={step.choices} onPick={checkAnswer} disabled={locked} />
+          ) : step.input === "clock-set" && step.inputSpec ? (
+            <ClockInput key={step.id} spec={step.inputSpec} onSubmit={(v) => checkAnswer(v)} disabled={locked} />
+          ) : step.input === "line-hop" && step.inputSpec ? (
+            <DayLineInput key={step.id} spec={step.inputSpec} onSubmit={(v) => checkAnswer(v)} disabled={locked} />
           ) : (
             <>
               <div className="text-center text-4xl font-bold text-pink-600 h-12 mb-2">
@@ -300,4 +315,12 @@ async function fireConfetti() {
   } catch {
     /* confetti is non-essential */
   }
+}
+
+function WarmupChip() {
+  return (
+    <div className="inline-block bg-amber-100 border-2 border-amber-300 text-amber-800 text-xs font-bold rounded-full px-3 py-1 mb-2">
+      ⭐ Warm-up
+    </div>
+  );
 }

@@ -15,7 +15,12 @@ export const STAGE_BLURB: Record<Stage, string> = {
   solo: "All on your own! Solve it and tell me the answer.",
 };
 
-export type InputKind = "number" | "choice";
+// "clock-set": she hops the hour hand around a ClockFace and submits the hour
+//   it points at (1..12) — numeric answer semantics, identical to "number".
+// "line-hop": she hops along a DayLine and submits the landing cell's number
+//   (12-hour, or the bottom 0..23 row when inputSpec.row === "h24"), or the
+//   COUNT of hops made when inputSpec.mode === "count". Numeric semantics too.
+export type InputKind = "number" | "choice" | "clock-set" | "line-hop";
 export interface Choice {
   label: string;
   value: number | string;
@@ -29,6 +34,8 @@ export interface Step {
   choices?: Choice[]; // when input === "choice"
   hint: string; // nudge after a wrong attempt — never the answer
   decoyQuestions: string[]; // Lead stage: plausible-but-wrong "next questions"
+  warmup?: boolean; // "⭐ Warm-up" from yesterday's lesson; Lead skips question-picking
+  inputSpec?: FigureSpec; // the figure a clock-set / line-hop step renders interactively
 }
 
 export interface FigureSpec {
