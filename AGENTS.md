@@ -20,9 +20,9 @@ client-side site. Progress lives in `localStorage`.
 stack and pink/purple **Bubblegum Sans** look as `aoife-math`, so it feels like part of her
 set.
 
-- **18 frameworks** (e.g. "Two Kinds · Count & Legs", "Sharing with Leftovers",
-  "Fenceposts & Spacing", "Shape Equations", "Number Bonds"…), grouped into 5 families on
-  the home grid (`app/page.tsx`).
+- **32 frameworks** (e.g. "Two Kinds · Count & Legs", "Sharing with Leftovers",
+  "Shape Equations", "Number Bonds"…), grouped into 7 families on the home grid
+  (`app/page.tsx`). The **Time & Clocks family is a 9-day story ladder** — see §7.
 - **4-stage ladder per framework** (`lib/engine/`): **Watch** (app works it, narrating each
   question + answer) → **Together** (app asks, she answers, hint on error) → **Lead** (she
   *chooses which question to ask next*, then answers it) → **Solo** (fresh problem, she
@@ -59,11 +59,14 @@ never touched**.
 The strict self-test in `lib/frameworks/frameworks.test.ts` runs every generator across **500
 seeds** and asserts:
 
-1. Every `input:'number'` step `answer` is a **non-negative integer**.
+1. Every numeric step (`number`, `clock-set`, `line-hop`) `answer` is a **non-negative integer**.
 2. Every step has **≥2 `decoyQuestions`**, none equal to its own `ask`, and a non-empty `hint`.
 3. Every `input:'choice'` step has ≥2 `choices`, one of which has `.value === answer`.
-4. Every `finalAnswers[i].value` is a **non-negative integer**.
-5. `invariant(data)` is **true** for every generated problem.
+4. Every `finalAnswers[i].value` is a **non-negative integer**, is **reached** by some numeric
+   step, and the **last step's answer is a final answer** (the script must end on the answer).
+5. No "What is A op B?" decoy may evaluate to a real answer.
+6. `invariant(data)` is **true** for every generated problem.
+7. Figure/`inputSpec` numbers must match `data` (`lib/figures/figures.test.ts`, 300 seeds).
 
 **Keep the arithmetic small and clean.** The child is ~7 and good at computation — the
 *thinking* is the challenge, never the numbers. If a generated value could go negative or
@@ -73,7 +76,10 @@ fractional, fix the generation ranges so it can't.
 
 Frameworks that need a picture set `Problem.figure` to a `FigureSpec`; `lib/figures/Figure.tsx`
 dispatches on `spec.kind` to a pure component: `numberBond`, `bars`, `dotArray`, `postRow`,
-`sequence`, `grid`, `shapes`. No external assets — all generated SVG/flex.
+`sequence`, `grid`, `shapes`, `dayLine`, `clockFace`. No external assets — all generated
+SVG/flex. `dayLine` (24-cell midnight→noon→midnight strip; gold/purple ribbons, anchor-event
+icons, per-hour hop arcs, `double` 0–23 row, `stacked` two-city + NOW line) and `clockFace`
+(hour hand, ghost start hand, a.m./p.m. rim color) are the Time & Clocks shared visuals.
 
 ## 4. Progress
 
@@ -89,16 +95,18 @@ on the home title opens a hidden progress overlay (mirrors the sibling app's ges
 ## 5. Repo layout
 
 ```
-app/page.tsx            — home grid (18 tiles by family) + progress + parent peek
+app/page.tsx            — home grid (32 tiles by family; Time & Clocks as 2 chapters) + parent peek
 app/f/[id]/page.tsx     — framework screen; mounts <StageEngine>
 app/globals.css         — Tailwind v4 theme (pink/purple, Bubblegum Sans) + framework classes
 lib/types.ts            — Framework / Problem / Step / FigureSpec / Stage
 lib/rng.ts              — seedable RNG (deterministic generators)
 lib/progress.ts         — localStorage progress
-lib/engine/             — StageEngine, StageRunner, Numpad, ChoicePad
-lib/figures/            — Figure dispatcher + 7 figure components
+lib/engine/             — StageEngine, StageRunner, Numpad, ChoicePad, ClockInput, DayLineInput, rich (chips)
+lib/figures/            — Figure dispatcher + 9 figure components
 lib/frameworks/<id>.ts  — one framework each (generator + question-script)
 lib/frameworks/index.ts — FRAMEWORKS registry + byId() + FAMILIES
+lib/frameworks/time-shared.ts — Time & Clocks anchors/cities/warm-up factories
+lib/frameworks/time-ladder.ts — Day 1-9 chapter metadata for the home page
 lib/frameworks/frameworks.test.ts — the 500-seed self-test harness
 docs/superpowers/       — design spec + implementation plan
 ```
@@ -116,3 +124,29 @@ docs/superpowers/       — design spec + implementation plan
   `vercel --prod` from the CLI (same situation as `aoife-math`).
 - Adding/removing a framework: update `lib/frameworks/index.ts` and the `frameworks.test.ts`
   count assertion (`FRAMEWORKS.length`) together.
+
+## 7. Time & Clocks — the 9-day ladder (redesigned 2026-07-11, don't "simplify" away)
+
+Rebuilt per `docs/superpowers/specs/2026-07-11-time-clocks-redesign-design.md` after the
+original text-only version proved unintuitive. Design law: **see it / count it — never
+memorize it.** The wrap past 12 and the a.m./p.m. flip HAPPEN on screen while she counts;
+"−12"/"+12" appear only as "✨ magic shortcut" hint text, never as a required step.
+
+- **Two chapters on the home page** (`time-ladder.ts`): 🏠 Aoife's Day (Days 1–5: am-pm,
+  hop-hours, past-noon, clock-add, clock-24) and 🌍 Around the World (Days 6–9:
+  time-difference, time-zones, chained-zones, flight-zones). One new idea per day; a
+  "⭐ start here" ring marks the first un-soloed day. **Nothing is locked.**
+- **Chips:** every time value in this family is a `[[7|am]]` token (`chip()` in
+  `lib/clock.ts`), rendered as a gold ☀️ a.m. / purple 🌙 p.m. pill by
+  `lib/engine/rich.tsx`. **Never write a naked time string.** a.m./p.m. is always taught as
+  before-lunch ☀️ / after-lunch 🌙; noon = 🥪 lunchtime; midnight = 💤 mid-sleep.
+- **Interactive steps:** `input:'clock-set'` (hop the hour hand; cumulative angle so the
+  sweep goes FORWARD through 12) and `input:'line-hop'` (hop the 24-cell strip; `mode:
+  'land' | 'count'`, `row: 'h12' | 'h24'`) — both submit numbers and validate exactly like
+  `number` steps. Watch stage auto-plays them (`demo` prop).
+- **Warm-ups:** Days 2–9 open with a `warmup: true` step from *yesterday's* skill
+  (factories in `time-shared.ts`). Lead skips question-picking for warm-ups; Solo never
+  shows steps, so warm-ups stay out of it. Warm-up answers don't need to feed the final.
+- **Story realism:** Days 1–5 star Aoife herself and all start-times stay inside her waking
+  day (no 1 a.m. painting). Whole hours only (`lib/clock.ts` — minutes never change).
+- The last step of every time framework is the numeric landing step (contract rule 4).
