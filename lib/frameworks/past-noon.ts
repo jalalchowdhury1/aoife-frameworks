@@ -101,10 +101,10 @@ export const pastNoon: Framework = {
       promptText: `At ${c(s24, "a.m.")} Aoife ${doing}. She keeps going for ${hop} ${plural(hop)}. What time is it when she stops?${
         crossing ? " (Psst — the same flip happens at 💤 midnight, while you're fast asleep.)" : ""
       }`,
+      // Start cell only — hop arcs drawn to the landing would reveal the answer.
       figure: {
         kind: "dayLine",
-        hopFrom: s24,
-        hopTo: land24,
+        highlight: s24,
       },
       steps,
       finalAsk: "What hour does Aoife stop at?",

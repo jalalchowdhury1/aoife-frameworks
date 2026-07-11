@@ -104,7 +104,7 @@ export const timeZones: Framework = {
       promptText: `${b}'s clocks are ${offset} ${plural(offset)} ${ahead ? "AHEAD of" : "BEHIND"} ${a}'s. When it is ${c(h12, ampm)} in ${a}, what time is it in ${b}?`,
       figure:
         fig === 0
-          ? { kind: "dayLine", hopFrom: a24, hopTo: land24raw }
+          ? { kind: "dayLine", highlight: a24 }
           : { kind: "clockFace", hour: h12, ampm: ampm === "a.m." ? "am" : "pm" },
       steps,
       finalAsk: `What hour does ${b}'s clock show?`,

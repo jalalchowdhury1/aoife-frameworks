@@ -38,13 +38,14 @@ export const hopHours: Framework = {
     const fig = rng.pick([0, 1]); // 0 = day-line hop, 1 = clock-face hop
     const doing = rng.pick(DOINGS);
 
-    const figure =
+    // The interactive spec knows the journey; the PROBLEM figure shows only
+    // the start — a figure that shows the landing would reveal the answer.
+    const inputSpec =
       fig === 0
         ? {
             kind: "dayLine",
             hopFrom: to24(s, ampm),
             hopTo: to24(land, ampm),
-            // input fields
             start: to24(s, ampm),
             hops: k,
             mode: "land",
@@ -54,9 +55,12 @@ export const hopHours: Framework = {
             hour: land,
             ampm: ampm === "a.m." ? "am" : "pm",
             ghostHour: s,
-            // input fields
             hops: k,
           };
+    const figure =
+      fig === 0
+        ? { kind: "dayLine", highlight: to24(s, ampm) }
+        : { kind: "clockFace", hour: s, ampm: ampm === "a.m." ? "am" : "pm" };
 
     const steps: Step[] = [
       warmupHalf(rng),
@@ -78,7 +82,7 @@ export const hopHours: Framework = {
       {
         id: "land",
         input: fig === 0 ? "line-hop" : "clock-set",
-        inputSpec: figure,
+        inputSpec,
         ask: `Start at ${c(s, ampm)} and hop ${k} ${plural(k)} forward. What hour do you land on?`,
         answer: land,
         hint: `Tap one hop at a time and count out loud — 1… 2… you'll land right on it. On the clock it's the same: the hand moves ${k} number${k === 1 ? "" : "s"} around.`,

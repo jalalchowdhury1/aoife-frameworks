@@ -128,37 +128,38 @@ describe("figure data matches problem data", () => {
     });
   });
 
-  it("hop-hours: hop figure/input matches start, hops, landing", () => {
+  it("hop-hours: figure shows only the START; input hops to the landing", () => {
     each("hop-hours", (p) => {
       const f = p.figure!;
       const spec = p.steps[p.steps.length - 1].inputSpec!;
+      const base = p.data.isPm === 1 ? 12 : 0;
+      const from = base + p.data.s;
       if (p.data.fig === 0) {
         expect(f.kind).toBe("dayLine");
-        const base = p.data.isPm === 1 ? 12 : 0;
-        const from = p.data.s === 12 ? base : base + p.data.s;
-        expect(f.hopFrom).toBe(from);
-        expect(f.hopTo).toBe(from + p.data.k);
+        expect(f.highlight).toBe(from); // start only — never the landing
+        expect(f.hopTo).toBeUndefined();
         expect(spec.start).toBe(from);
         expect(spec.hops).toBe(p.data.k);
       } else {
         expect(f.kind).toBe("clockFace");
-        expect(f.ghostHour).toBe(p.data.s);
-        expect(f.hour).toBe(p.data.land);
+        expect(f.hour).toBe(p.data.s); // start only — never the landing
+        expect(spec.ghostHour).toBe(p.data.s);
+        expect(spec.hour).toBe(p.data.land);
         expect(spec.hops).toBe(p.data.k);
       }
     });
   });
 
-  it("past-noon: dayLine hop crosses (or not) exactly as data says", () => {
+  it("past-noon: figure marks only the start; input crosses per data", () => {
     each("past-noon", (p) => {
       const f = p.figure!;
       expect(f.kind).toBe("dayLine");
-      expect(f.hopFrom).toBe(p.data.s24);
-      expect(f.hopTo).toBe(p.data.land24);
-      expect((f.hopTo as number) >= 12).toBe(p.data.crossed === 1);
+      expect(f.highlight).toBe(p.data.s24); // start only — arcs would reveal
+      expect(f.hopTo).toBeUndefined();
       const spec = p.steps[p.steps.length - 1].inputSpec!;
       expect(spec.start).toBe(p.data.s24);
       expect(spec.hops).toBe(p.data.hop);
+      expect((spec.hopTo as number) >= 12).toBe(p.data.crossed === 1);
     });
   });
 
@@ -174,16 +175,18 @@ describe("figure data matches problem data", () => {
     });
   });
 
-  it("clock-24: double day-line highlights the 24-hour answer cell", () => {
+  it("clock-24: double day-line never pre-highlights the answer cell", () => {
     each("clock-24", (p) => {
       const f = p.figure!;
       expect(f.kind).toBe("dayLine");
       expect(f.variant).toBe("double");
-      expect(f.highlight).toBe(p.data.result);
+      expect(f.highlight).toBeUndefined(); // finding the cell IS the task
       const spec = p.steps[p.steps.length - 1].inputSpec!;
       expect(spec.row).toBe("h24");
+      expect(spec.highlight).toBeUndefined();
       expect(spec.start).toBe(p.data.isPm === 1 ? 12 : 0);
       expect(spec.hops).toBe(p.data.h12);
+      expect((spec.start as number) + (spec.hops as number)).toBe(p.data.result);
     });
   });
 
