@@ -6,10 +6,16 @@ import { PostRow } from "./PostRow";
 import { Sequence } from "./Sequence";
 import { Grid } from "./Grid";
 import { Shapes } from "./Shapes";
+import { DayLine } from "./DayLine";
+import { ClockFace } from "./ClockFace";
 
 export function Figure({ spec }: { spec?: FigureSpec }) {
   if (!spec) return null;
   switch (spec.kind) {
+    case "dayLine":
+      return <DayLine spec={spec} />;
+    case "clockFace":
+      return <ClockFace spec={spec} />;
     case "numberBond":
       return <NumberBond spec={spec} />;
     case "bars":
