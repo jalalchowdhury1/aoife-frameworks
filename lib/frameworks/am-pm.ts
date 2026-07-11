@@ -1,77 +1,84 @@
 import type { Framework, Problem, Step } from "../types";
 import type { Rng } from "../rng";
+import { from24, type AmPm } from "../clock";
+import { AM_ANCHORS, PM_ANCHORS, halfChoices, c } from "./time-shared";
 
-const NAMES = ["Aoife", "Bron", "Santino", "Mayam", "Natalia"];
-// a.m. = midnight→noon (morning). p.m. = noon→midnight (afternoon/evening/night).
-const AM_EVENTS = [
-  { act: "wakes up", h: 7 },
-  { act: "eats breakfast", h: 8 },
-  { act: "starts school", h: 9 },
-  { act: "sees the sun come up", h: 6 },
-];
-const PM_EVENTS = [
-  { act: "plays after school", h: 4 },
-  { act: "eats dinner", h: 6 },
-  { act: "reads a bedtime story", h: 8 },
-  { act: "watches the sunset", h: 7 },
-];
-
-// Foundation: decide a.m. or p.m. from the part of the day, then COUNT the p.m. ones.
+// Day 1 · 🏠 Aoife's Day — "Morning or After-Lunch?"
+// THE foundation idea of the whole ladder: a.m. = the gold ☀️ half before
+// lunch, p.m. = the purple 🌙 half after lunch. She sorts her own day's events
+// by finding them on the day-line, then counts the after-lunch ones.
 export const amPm: Framework = {
   id: "am-pm",
-  title: "A.M. or P.M.?",
+  title: "Morning or After-Lunch?",
   emoji: "🌅",
   family: "Time & Clocks",
   blurb:
-    "Morning is a.m., afternoon and night are p.m. Sort a day's events, then count the p.m. ones.",
+    "Before lunch is the ☀️ half, after lunch is the 🌙 half. Sort Aoife's day, then count.",
   source: "photo",
-  invariant: (d) => d.amCount + d.pmCount === 4 && d.pmCount >= 1 && d.pmCount <= 3,
+  invariant: (d) =>
+    d.amCount + d.pmCount === 4 &&
+    d.pmCount >= 1 &&
+    d.pmCount <= 3 &&
+    [d.e0, d.e1, d.e2, d.e3].every((h) => h >= 0 && h <= 23),
   generate(rng: Rng): Problem {
-    const name = rng.pick(NAMES);
     const pmCount = rng.int(1, 3);
     const amCount = 4 - pmCount;
-    const ams = rng.shuffle(AM_EVENTS).slice(0, amCount).map((e) => ({ ...e, ampm: "a.m." }));
-    const pms = rng.shuffle(PM_EVENTS).slice(0, pmCount).map((e) => ({ ...e, ampm: "p.m." }));
+    const ams = rng.shuffle([...AM_ANCHORS]).slice(0, amCount);
+    const pms = rng.shuffle([...PM_ANCHORS]).slice(0, pmCount);
     const events = rng.shuffle([...ams, ...pms]);
 
-    const steps: Step[] = events.map((e, i) => ({
-      id: `ev${i}`,
-      input: "choice" as const,
-      ask: `${name} ${e.act} at ${e.h}:00. Is that a.m. or p.m.?`,
-      choices: [
-        { label: "a.m. (morning)", value: "a.m." },
-        { label: "p.m. (afternoon / night)", value: "p.m." },
-      ],
-      answer: e.ampm,
-      hint:
-        e.ampm === "a.m."
-          ? "This happens in the MORNING — before noon — so it's a.m."
-          : "This happens in the AFTERNOON or at NIGHT — after noon — so it's p.m.",
-      decoyQuestions: [
-        "How many events are there in all?",
-        "What time does the next event happen?",
-      ],
-    }));
+    const steps: Step[] = events.map((e, i) => {
+      const clock = from24(e.h);
+      const ampm: AmPm = clock.ampm;
+      return {
+        id: `ev${i}`,
+        input: "choice" as const,
+        ask: `Aoife ${e.label} ${e.icon} at ${c(clock.h12, ampm)}. Is that before or after lunch?`,
+        choices: halfChoices,
+        answer: ampm,
+        hint:
+          ampm === "a.m."
+            ? `Find ${e.icon} on the day-line — it sits under the gold ☀️ ribbon, before 🥪 lunch.`
+            : `Find ${e.icon} on the day-line — it sits under the purple 🌙 ribbon, after 🥪 lunch.`,
+        decoyQuestions: [
+          "How many events are there in all?",
+          "How many hours are in a whole day?",
+        ],
+      };
+    });
 
     steps.push({
       id: "count",
       input: "number",
-      ask: "Now count them: how many of these events happen in the p.m.?",
+      ask: "Now count: how many of Aoife's events happen AFTER lunch (the 🌙 p.m. half)?",
       answer: pmCount,
-      hint: "Look back at which ones you marked p.m. (afternoon/night) and count them.",
+      hint: "Look back at the ones you put under the purple 🌙 ribbon and count them.",
       decoyQuestions: [
-        "How many happen in the a.m.?",
+        "How many happen before lunch?",
         "How many events are there in all?",
       ],
     });
 
-    const list = events.map((e) => `${e.act} at ${e.h}:00`).join(", ");
+    const list = events
+      .map((e) => `${e.label} ${e.icon} at ${c(from24(e.h).h12, from24(e.h).ampm)}`)
+      .join(", ");
     return {
-      promptText: `In one day, ${name} does these things: ${list}. How many of them happen in the p.m. (afternoon or night)?`,
+      promptText: `In one day, Aoife: ${list}. How many of these happen AFTER lunch — in the 🌙 p.m. half of the day?`,
+      figure: {
+        kind: "dayLine",
+        events: events.map((e) => ({ hour24: e.h, icon: e.icon })),
+      },
       steps,
-      finalAsk: "How many events happen in the p.m.?",
-      finalAnswers: [{ label: "in the p.m.", value: pmCount }],
-      data: { amCount, pmCount },
+      finalAsk: "How many events happen after lunch (p.m.)?",
+      finalAnswers: [{ label: "after lunch (p.m.)", value: pmCount }],
+      data: {
+        amCount,
+        pmCount,
+        e0: events[0].h,
+        e1: events[1].h,
+        e2: events[2].h,
+        e3: events[3].h,
+      },
     };
   },
 };

@@ -117,6 +117,17 @@ describe("figure data matches problem data", () => {
     });
   });
 
+  it("am-pm: dayLine event icons sit at the problem's hours", () => {
+    each("am-pm", (p) => {
+      const f = p.figure!;
+      expect(f.kind).toBe("dayLine");
+      const events = f.events as { hour24: number; icon: string }[];
+      expect(events.map((e) => e.hour24)).toEqual([p.data.e0, p.data.e1, p.data.e2, p.data.e3]);
+      const pmShown = events.filter((e) => e.hour24 >= 12).length;
+      expect(pmShown).toBe(p.data.pmCount);
+    });
+  });
+
   it("shape-equations: equation strings match the secret values", () => {
     each("shape-equations", (p) => {
       const eqs = p.figure!.equations as string[];
