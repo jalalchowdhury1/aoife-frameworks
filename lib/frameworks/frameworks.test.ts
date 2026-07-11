@@ -83,8 +83,8 @@ describe("every framework generator", () => {
       }
     });
   }
-  it("registry has 30 unique ids", () => {
-    expect(FRAMEWORKS.length).toBe(30);
-    expect(new Set(FRAMEWORKS.map((f) => f.id)).size).toBe(30);
+  it("registry has 32 unique ids", () => {
+    expect(FRAMEWORKS.length).toBe(32);
+    expect(new Set(FRAMEWORKS.map((f) => f.id)).size).toBe(32);
   });
 });

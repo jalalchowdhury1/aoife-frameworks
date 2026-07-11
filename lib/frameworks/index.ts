@@ -31,6 +31,8 @@ import { equalBills } from "./equal-bills";
 import { twoCoins } from "./two-coins";
 // Family 7 · Time & Clocks
 import { amPm } from "./am-pm";
+import { hopHours } from "./hop-hours";
+import { pastNoon } from "./past-noon";
 import { clockAdd } from "./clock-add";
 import { clock24 } from "./clock-24";
 import { timeDifference } from "./time-difference";
@@ -64,6 +66,8 @@ export const FRAMEWORKS: Framework[] = [
   equalBills,
   twoCoins,
   amPm,
+  hopHours,
+  pastNoon,
   clockAdd,
   clock24,
   timeDifference,

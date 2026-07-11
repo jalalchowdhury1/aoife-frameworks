@@ -128,6 +128,40 @@ describe("figure data matches problem data", () => {
     });
   });
 
+  it("hop-hours: hop figure/input matches start, hops, landing", () => {
+    each("hop-hours", (p) => {
+      const f = p.figure!;
+      const spec = p.steps[p.steps.length - 1].inputSpec!;
+      if (p.data.fig === 0) {
+        expect(f.kind).toBe("dayLine");
+        const base = p.data.isPm === 1 ? 12 : 0;
+        const from = p.data.s === 12 ? base : base + p.data.s;
+        expect(f.hopFrom).toBe(from);
+        expect(f.hopTo).toBe(from + p.data.k);
+        expect(spec.start).toBe(from);
+        expect(spec.hops).toBe(p.data.k);
+      } else {
+        expect(f.kind).toBe("clockFace");
+        expect(f.ghostHour).toBe(p.data.s);
+        expect(f.hour).toBe(p.data.land);
+        expect(spec.hops).toBe(p.data.k);
+      }
+    });
+  });
+
+  it("past-noon: dayLine hop crosses (or not) exactly as data says", () => {
+    each("past-noon", (p) => {
+      const f = p.figure!;
+      expect(f.kind).toBe("dayLine");
+      expect(f.hopFrom).toBe(p.data.s24);
+      expect(f.hopTo).toBe(p.data.land24);
+      expect((f.hopTo as number) >= 12).toBe(p.data.crossed === 1);
+      const spec = p.steps[p.steps.length - 1].inputSpec!;
+      expect(spec.start).toBe(p.data.s24);
+      expect(spec.hops).toBe(p.data.hop);
+    });
+  });
+
   it("shape-equations: equation strings match the secret values", () => {
     each("shape-equations", (p) => {
       const eqs = p.figure!.equations as string[];
