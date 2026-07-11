@@ -32,7 +32,9 @@ export const clockAdd: Framework = {
     d.add <= 8,
   generate(rng: Rng): Problem {
     const ampm: AmPm = rng.pick(["a.m.", "p.m."]);
-    const h12 = rng.int(1, 11); // no 12 start — keeps "past the 12?" honest
+    // No 12 start (keeps "past the 12?" honest) and no middle-of-the-night
+    // starts: morning activities begin 7-11 a.m., afternoon ones 1-11 p.m.
+    const h12 = ampm === "a.m." ? rng.int(7, 11) : rng.int(1, 11);
     const add = rng.int(1, 8);
     const start = { h12, ampm };
     const sum = h12 + add;

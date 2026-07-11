@@ -30,7 +30,9 @@ export const hopHours: Framework = {
     (d.fig === 0 || d.fig === 1),
   generate(rng: Rng): Problem {
     const ampm: AmPm = rng.pick(["a.m.", "p.m."]);
-    const s = rng.int(1, 8);
+    // Stay inside her waking day: mornings start 7-8 (after wake-up 🌅),
+    // afternoons start 1-8. Both keep s + k <= 11 so lunch is never crossed.
+    const s = ampm === "a.m." ? rng.int(7, 8) : rng.int(1, 8);
     const k = rng.int(1, Math.min(3, 11 - s));
     const land = s + k;
     const fig = rng.pick([0, 1]); // 0 = day-line hop, 1 = clock-face hop
