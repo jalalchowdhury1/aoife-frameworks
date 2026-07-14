@@ -5,6 +5,7 @@ import type { Problem, Stage, Step } from "../types";
 import { makeRng } from "../rng";
 import { Numpad } from "./Numpad";
 import { ChoicePad } from "./ChoicePad";
+import { fireConfetti } from "./confetti";
 import { ClockInput } from "./ClockInput";
 import { DayLineInput } from "./DayLineInput";
 import { renderRich } from "./rich";
@@ -229,18 +230,23 @@ function StepRunner({
 
 /* ----------------------------------- Solo ----------------------------------- */
 
-function SoloRunner({
+export function SoloRunner({
   problem,
   onComplete,
+  celebrate = true, // false → no per-problem confetti (practice fires its own at run end)
+  onSolved, // practice: called with firstTry instead of onComplete
 }: {
   problem: Problem;
   onComplete: (stage: Stage) => void;
+  celebrate?: boolean;
+  onSolved?: (firstTry: boolean) => void;
 }) {
   const finals = problem.finalAnswers;
   const [slot, setSlot] = useState(0);
   const [entry, setEntry] = useState("");
   const [filled, setFilled] = useState<number[]>([]);
   const [wrong, setWrong] = useState(false);
+  const everWrong = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(
@@ -254,6 +260,7 @@ function SoloRunner({
     const ok = Number(entry) === finals[slot].value;
     if (!ok) {
       setWrong(true);
+      everWrong.current = true;
       setEntry("");
       timer.current = setTimeout(() => setWrong(false), 1200);
       return;
@@ -262,8 +269,11 @@ function SoloRunner({
     setFilled(nextFilled);
     setEntry("");
     if (slot + 1 >= finals.length) {
-      void fireConfetti();
-      timer.current = setTimeout(() => onComplete("solo"), 400);
+      if (celebrate) void fireConfetti();
+      timer.current = setTimeout(() => {
+        if (onSolved) onSolved(!everWrong.current);
+        else onComplete("solo");
+      }, 400);
     } else {
       setSlot(slot + 1);
     }
@@ -308,14 +318,6 @@ function SoloRunner({
   );
 }
 
-async function fireConfetti() {
-  try {
-    const confetti = (await import("canvas-confetti")).default;
-    confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
-  } catch {
-    /* confetti is non-essential */
-  }
-}
 
 function WarmupChip() {
   return (
