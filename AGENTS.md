@@ -84,8 +84,17 @@ icons, per-hour hop arcs, `double` 0–23 row, `stacked` two-city + NOW line) an
 ## 4. Progress
 
 `lib/progress.ts` stores per-framework progress under `localStorage["aoife-frameworks-progress"]`:
-`{ stageReached: 1..4, soloPasses, lastPlayed }`. Stages unlock in order (the next rung is
-always available); the home grid shows pips + a ⭐ once soloed. **Parent peek:** 5 quick taps
+`{ stageReached: 1..4, soloPasses, lastPlayed, practiceRuns?, perfectRuns? }`. Stages unlock
+in order (the next rung is always available); the home grid shows pips + a ⭐ once soloed
+(+ 🔁 once a perfect practice run exists).
+
+**🔁 Practice mode (added 2026-07-13):** a 5th pill after Solo on every framework — five
+fresh Solo-style problems back to back (`lib/engine/PracticeRunner.tsx`, reuses the exported
+`SoloRunner` via `celebrate`/`onSolved` props). ⭐ = first-try, ✅ = after a retry; a wrong
+answer never resets the run; all-⭐ ends with the big confetti + 🏆 panel. Practice is NOT a
+member of `STAGES` (a sibling `mode` in `StageEngine`) — do not fold it into the stage
+array, that would change progress semantics. Unlocks with Solo. `recordPractice(id,
+perfect)` is additive-only on the stored JSON. **Parent peek:** 5 quick taps
 on the home title opens a hidden progress overlay (mirrors the sibling app's gesture).
 
 > **Lint gotcha (from the sibling repo):** never call `Date.now()` / `new Date()` /
