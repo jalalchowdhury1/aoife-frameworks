@@ -273,6 +273,11 @@ export function SoloRunner({
     [],
   );
 
+  const arm = (fn: () => void, ms: number) => {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(fn, ms);
+  };
+
   const submit = () => {
     if (done) return;
     const ok = Number(entry) === finals[slot].value;
@@ -280,7 +285,7 @@ export function SoloRunner({
       setWrong(true);
       everWrong.current = true;
       setEntry("");
-      timer.current = setTimeout(() => setWrong(false), 1200);
+      arm(() => setWrong(false), 1200);
       return;
     }
     const nextFilled = [...filled, finals[slot].value];
@@ -289,7 +294,7 @@ export function SoloRunner({
     if (slot + 1 >= finals.length) {
       setDone(true);
       if (celebrate) void fireConfetti();
-      timer.current = setTimeout(() => {
+      arm(() => {
         if (onSolved) onSolved(!everWrong.current);
         else onComplete("solo");
       }, 400);

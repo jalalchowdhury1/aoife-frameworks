@@ -91,10 +91,12 @@ export function DayLineInput({
               }`}
             >
               <span
-                className="w-9 h-9 rounded-md flex items-center justify-center text-lg"
+                className={`w-9 h-9 rounded-md flex items-center justify-center ${
+                  h === pos && h === target ? "text-sm" : "text-lg"
+                }`}
                 style={{ backgroundColor: cellFill(h) }}
               >
-                {h === pos ? "🐇" : h === target ? "🚩" : h === 12 ? "🥪" : ""}
+                {h === pos ? (h === target ? "🐇🚩" : "🐇") : h === target ? "🚩" : h === 12 ? "🥪" : ""}
               </span>
               <span className="text-xs font-bold text-purple-800">{h12Label(h)}</span>
               {row === "h24" && (

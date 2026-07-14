@@ -56,9 +56,10 @@ export function warmupHalf(rng: Rng): Step {
 
 // Day 2 skill: a small same-half hop (no crossing, no wrap).
 export function warmupHop(rng: Rng): Step {
-  const s = rng.int(1, 8);
-  const k = rng.int(1, Math.min(3, 10 - s));
+  // Same waking-day starts as the lessons: mornings 7-8, afternoons 1-5.
   const ampm: AmPm = rng.pick(["a.m.", "p.m."]);
+  const s = ampm === "a.m." ? rng.int(7, 8) : rng.int(1, 5);
+  const k = rng.int(1, Math.min(3, 10 - s));
   return {
     id: "warmup",
     warmup: true,
@@ -93,9 +94,10 @@ export function warmupCross(rng: Rng): Step {
 
 // Day 4 skill: a tiny clock add (kept wrap-free so it stays a 5-second warm-up).
 export function warmupClockAdd(rng: Rng): Step {
-  const s = rng.int(1, 8);
-  const k = rng.int(1, Math.min(3, 11 - s));
+  // Same waking-day starts as the lessons: mornings 7-8, afternoons 1-5.
   const ampm: AmPm = rng.pick(["a.m.", "p.m."]);
+  const s = ampm === "a.m." ? rng.int(7, 8) : rng.int(1, 5);
+  const k = rng.int(1, Math.min(3, 11 - s));
   return {
     id: "warmup",
     warmup: true,
