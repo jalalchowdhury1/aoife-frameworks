@@ -130,6 +130,7 @@ export default function Home() {
                   <th className="py-1">Framework</th>
                   <th>Stage</th>
                   <th>Solos</th>
+                  <th>Practice</th>
                 </tr>
               </thead>
               <tbody>
@@ -145,6 +146,10 @@ export default function Home() {
                         {reached === 0 ? "—" : STAGE_LABEL[STAGES[reached - 1]]}
                       </td>
                       <td className="text-green-600">{p?.soloPasses ?? 0}</td>
+                      <td className="text-amber-600">
+                        {p?.practiceRuns ?? 0}
+                        {(p?.perfectRuns ?? 0) > 0 ? ` (⭐${p!.perfectRuns})` : ""}
+                      </td>
                     </tr>
                   );
                 })}
@@ -186,6 +191,7 @@ function Tile({
               Day {day}
             </span>
           )}
+          {(p?.perfectRuns ?? 0) > 0 && <span title="Perfect practice!">🔁</span>}
           {mastered && <span title="Mastered!">⭐</span>}
         </span>
       </div>
