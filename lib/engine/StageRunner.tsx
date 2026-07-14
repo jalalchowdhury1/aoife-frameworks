@@ -74,6 +74,20 @@ function StepRunner({
 
   const step = steps[idx];
 
+  // ONE pending timer at a time: arming or clearing always kills the previous
+  // one, so a stale Lead "bad question" timeout can never wipe later feedback,
+  // un-lock a locked step, or double-fire advance.
+  const clearTimer = () => {
+    if (timer.current) {
+      clearTimeout(timer.current);
+      timer.current = null;
+    }
+  };
+  const arm = (fn: () => void, ms: number) => {
+    clearTimer();
+    timer.current = setTimeout(fn, ms);
+  };
+
   // Shuffled candidate questions for the Lead stage (stable per step).
   const leadChoices = useMemo(() => {
     if (stage !== "lead" || !step) return [];
@@ -98,10 +112,11 @@ function StepRunner({
 
   const handleCorrect = () => {
     setFeedback("correct");
-    timer.current = setTimeout(advance, 850);
+    arm(advance, 850);
   };
 
   const checkAnswer = (val: number | string) => {
+    clearTimer();
     const ok =
       step.input === "choice"
         ? val === step.answer
@@ -114,17 +129,18 @@ function StepRunner({
       setEntry("");
     } else {
       setFeedback("revealed");
-      timer.current = setTimeout(advance, 1700);
+      arm(advance, 1700);
     }
   };
 
   const pickQuestion = (q: number | string) => {
+    clearTimer();
     if (q === step.ask) {
       setQChosen(true);
       setFeedback(null);
     } else {
       setFeedback("badq");
-      timer.current = setTimeout(() => setFeedback(null), 1200);
+      arm(() => setFeedback(null), 1200);
     }
   };
 
@@ -246,6 +262,7 @@ export function SoloRunner({
   const [entry, setEntry] = useState("");
   const [filled, setFilled] = useState<number[]>([]);
   const [wrong, setWrong] = useState(false);
+  const [done, setDone] = useState(false); // final slot filled — ignore stray taps
   const everWrong = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -257,6 +274,7 @@ export function SoloRunner({
   );
 
   const submit = () => {
+    if (done) return;
     const ok = Number(entry) === finals[slot].value;
     if (!ok) {
       setWrong(true);
@@ -269,6 +287,7 @@ export function SoloRunner({
     setFilled(nextFilled);
     setEntry("");
     if (slot + 1 >= finals.length) {
+      setDone(true);
       if (celebrate) void fireConfetti();
       timer.current = setTimeout(() => {
         if (onSolved) onSolved(!everWrong.current);
@@ -310,9 +329,10 @@ export function SoloRunner({
 
       <Numpad
         value={entry}
-        onDigit={(d) => entry.length < 5 && setEntry(entry + d)}
+        onDigit={(d) => !done && entry.length < 5 && setEntry(entry + d)}
         onClear={() => setEntry("")}
         onSubmit={submit}
+        disabled={done}
       />
     </div>
   );

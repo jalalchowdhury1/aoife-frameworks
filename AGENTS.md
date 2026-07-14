@@ -153,7 +153,7 @@ memorize it.** The wrap past 12 and the a.m./p.m. flip HAPPEN on screen while sh
   before-lunch ☀️ / after-lunch 🌙; noon = 🥪 lunchtime; midnight = 💤 mid-sleep.
 - **Interactive steps:** `input:'clock-set'` (hop the hour hand; cumulative angle so the
   sweep goes FORWARD through 12) and `input:'line-hop'` (hop the 24-cell strip; `mode:
-  'land' | 'count'`, `row: 'h12' | 'h24'`) — both submit numbers and validate exactly like
+  'land' | 'count'`, `row: 'h12' | 'h24'`, optional `target` 🚩 cell that stops the hop) — both submit numbers and validate exactly like
   `number` steps. Watch stage auto-plays them (`demo` prop).
 - **Warm-ups:** Days 2–9 open with a `warmup: true` step from *yesterday's* skill
   (factories in `time-shared.ts`). Lead skips question-picking for warm-ups; Solo never

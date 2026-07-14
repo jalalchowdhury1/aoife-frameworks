@@ -10,7 +10,8 @@ import type { FigureSpec } from "../types";
 //                      when inputSpec.row === "h24" (the keep-counting clock)
 //   "count"          → how many hops were made (Day 6: hours apart)
 // inputSpec fields used: start (hour24 cell) · dir (+1/-1, default +1) ·
-// hops (true count — Watch demo) · mode · row
+// hops (true count — Watch demo) · mode · row · target (hour24 cell to hop to,
+// shown as 🚩 and the hop stops there — Day 6's "later mark")
 
 function cellFill(h: number): string {
   if (h <= 4 || h >= 21) return "#4338ca";
@@ -40,6 +41,7 @@ export function DayLineInput({
   const demoHops = (spec.hops as number) ?? 0;
   const mode = (spec.mode as string) ?? "land";
   const row = (spec.row as string) ?? "h12";
+  const target = spec.target as number | undefined;
   const [hops, setHops] = useState(0);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   const scroller = useRef<HTMLDivElement>(null);
@@ -78,7 +80,7 @@ export function DayLineInput({
               key={h}
               type="button"
               data-cell={h}
-              disabled={disabled || demo || h !== pos + dir}
+              disabled={disabled || demo || h !== pos + dir || pos === target}
               onClick={() => setHops((k) => k + 1)}
               className={`flex flex-col items-center shrink-0 w-11 rounded-lg border-2 py-1 ${
                 h === pos
@@ -92,7 +94,7 @@ export function DayLineInput({
                 className="w-9 h-9 rounded-md flex items-center justify-center text-lg"
                 style={{ backgroundColor: cellFill(h) }}
               >
-                {h === pos ? "🐇" : h === 12 ? "🥪" : ""}
+                {h === pos ? "🐇" : h === target ? "🚩" : h === 12 ? "🥪" : ""}
               </span>
               <span className="text-xs font-bold text-purple-800">{h12Label(h)}</span>
               {row === "h24" && (
@@ -111,7 +113,7 @@ export function DayLineInput({
         <div className="flex gap-2">
           <button
             type="button"
-            disabled={disabled || pos + dir < 0 || pos + dir > 23}
+            disabled={disabled || pos + dir < 0 || pos + dir > 23 || pos === target}
             onClick={() => setHops((k) => k + 1)}
             className="bg-pink-400 text-white rounded-2xl px-6 py-3 text-xl font-bold active:scale-95"
           >

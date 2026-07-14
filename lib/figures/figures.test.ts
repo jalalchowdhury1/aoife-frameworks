@@ -201,6 +201,7 @@ describe("figure data matches problem data", () => {
       expect(spec.mode).toBe("count");
       expect(spec.hops).toBe(p.data.offset);
       expect(spec.start).toBe(Math.min(p.data.a24, p.data.b24));
+      expect(spec.target).toBe(Math.max(p.data.a24, p.data.b24));
     });
   });
 

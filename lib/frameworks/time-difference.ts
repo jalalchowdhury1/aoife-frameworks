@@ -66,6 +66,7 @@ export const timeDifference: Framework = {
           start: earlier24,
           hops: offset,
           mode: "count",
+          target: earlier24 + offset, // the later mark — 🚩 on the strip
         },
         ask: `Count the hops from the earlier mark (${c(earlier.h12, earlier.ampm)}) to the later one (${c(later.h12, later.ampm)}). How many hours apart are they?`,
         answer: offset,

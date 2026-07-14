@@ -62,6 +62,8 @@ export function StageEngine({ framework }: { framework: Framework }) {
   };
 
   const goStage = (s: Stage) => {
+    // Tapping the already-active pill mid-run must not throw the problem away.
+    if (mode === "stages" && s === stage && !finished) return;
     setMode("stages");
     setPracticeDone(null);
     setStage(s);
@@ -70,6 +72,7 @@ export function StageEngine({ framework }: { framework: Framework }) {
   };
 
   const goPractice = () => {
+    if (mode === "practice" && !practiceDone) return; // already mid-run
     setMode("practice");
     setPracticeDone(null);
     setSeed(randomSeed());
