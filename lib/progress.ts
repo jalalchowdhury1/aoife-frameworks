@@ -20,7 +20,13 @@ export function readProgress(): Progress {
   }
 }
 function write(p: Progress) {
-  localStorage.setItem(PROGRESS_KEY, JSON.stringify(p));
+  // Storage can throw (Safari private mode, quota) — losing a progress write
+  // must never crash the tap handler that triggered it.
+  try {
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(p));
+  } catch {
+    /* progress is nice-to-have; play continues */
+  }
 }
 function entry(p: Progress, id: string): FwProgress {
   return p[id] ?? { stageReached: 0, soloPasses: 0, lastPlayed: "" };

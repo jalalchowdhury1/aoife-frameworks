@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { byId } from "./frameworks/index";
+import { byId, FRAMEWORKS, FAMILIES } from "./frameworks/index";
+import { TIME_CHAPTERS, TIME_DAY } from "./frameworks/time-ladder";
 import { makeRng } from "./rng";
 
 // Heavy-duty audit sweep (2026-07-13): 3000 seeds per Time & Clocks framework,
@@ -101,4 +102,33 @@ describe("stress: time frameworks at 3000 seeds", () => {
       }
     });
   }
+});
+
+describe("stress: whole registry", () => {
+  it("every framework survives 1000 seeds with sane child-visible text", () => {
+    for (const fw of FRAMEWORKS) {
+      for (let seed = 1; seed <= 1000; seed++) {
+        const p = fw.generate(makeRng(seed));
+        const texts = [
+          p.promptText,
+          p.finalAsk,
+          ...p.steps.flatMap((s) => [s.ask, s.hint, ...s.decoyQuestions]),
+          ...p.finalAnswers.map((f) => f.label),
+          ...p.steps.flatMap((s) => (s.choices ?? []).map((c) => String(c.label))),
+        ];
+        for (const t of texts) {
+          expect(t, `${fw.id} @${seed}`).not.toMatch(/undefined|NaN|\[object/);
+        }
+        expect(FAMILIES).toContain(fw.family);
+      }
+    }
+  });
+
+  it("time-ladder metadata matches the registry exactly", () => {
+    const ladderIds = TIME_CHAPTERS.flatMap((c) => [...c.ids]);
+    const familyIds = FRAMEWORKS.filter((f) => f.family === "Time & Clocks").map((f) => f.id);
+    expect([...ladderIds].sort()).toEqual([...familyIds].sort());
+    expect(Object.keys(TIME_DAY).sort()).toEqual([...familyIds].sort());
+    expect(ladderIds.map((id) => TIME_DAY[id])).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  });
 });
