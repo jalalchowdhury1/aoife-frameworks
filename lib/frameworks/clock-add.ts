@@ -26,15 +26,15 @@ export const clockAdd: Framework = {
     d.sum === d.h12 + d.add &&
     d.result === ((d.h12 + d.add - 1) % 12) + 1 &&
     (d.flip === 1) === d.sum >= 12 &&
-    d.h12 >= 1 &&
-    d.h12 <= 11 &&
+    (d.isPm === 1 ? d.h12 >= 1 && d.h12 <= 7 : d.h12 >= 7 && d.h12 <= 11) &&
     d.add >= 1 &&
     d.add <= 8,
   generate(rng: Rng): Problem {
     const ampm: AmPm = rng.pick(["a.m.", "p.m."]);
-    // No 12 start (keeps "past the 12?" honest) and no middle-of-the-night
-    // starts: morning activities begin 7-11 a.m., afternoon ones 1-11 p.m.
-    const h12 = ampm === "a.m." ? rng.int(7, 11) : rng.int(1, 11);
+    // No 12 start (keeps "past the 12?" honest) and waking-day starts only:
+    // mornings 7-11 a.m., afternoons 1-7 p.m. (bed is 8 p.m. — an activity may
+    // RUN past midnight, camping-style, but never START in the night).
+    const h12 = ampm === "a.m." ? rng.int(7, 11) : rng.int(1, 7);
     const add = rng.int(1, 8);
     const start = { h12, ampm };
     const sum = h12 + add;
@@ -54,7 +54,7 @@ export const clockAdd: Framework = {
           { label: "No — it stays before 12", value: "no" },
         ],
         answer: sum >= 12 ? "yes" : "no",
-        hint: `From ${h12}, the 12 is ${12 - h12} ${plural(12 - h12)} away. Is the hop bigger than that?`,
+        hint: `From ${h12}, the 12 is ${12 - h12} ${plural(12 - h12)} away. Is your hop at least that big? (Landing right on 12 counts!)`,
         decoyQuestions: [
           "Is the new time before or after lunch?",
           "What hour does the hand stop on?",

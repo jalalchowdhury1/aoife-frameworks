@@ -45,13 +45,13 @@ export const pastNoon: Framework = {
       {
         id: "cross",
         input: "choice",
-        ask: `Aoife starts at ${c(s24, "a.m.")} and hops ${hop} ${plural(hop)} forward. Will she hop PAST 🥪 lunchtime?`,
+        ask: `Aoife starts at ${c(s24, "a.m.")} and hops ${hop} ${plural(hop)} forward. Will she REACH 🥪 lunchtime (or hop past it)?`,
         choices: [
-          { label: "Yes — past lunch! 🥪➡️🌙", value: "yes" },
+          { label: "Yes — she reaches lunch! 🥪➡️🌙", value: "yes" },
           { label: "No — still before lunch ☀️", value: "no" },
         ],
         answer: crossing ? "yes" : "no",
-        hint: `Find ${s24} o'clock on the day-line and look: how many cells until the 🥪 marker? Is ${hop} enough to reach it?`,
+        hint: `Find ${c(s24, "a.m.")} on the day-line and look: how many cells until the 🥪 marker? Is ${hop} enough to reach it?`,
         decoyQuestions: [
           "What hour does she land on?",
           "How many hours are in a whole day?",
@@ -67,7 +67,7 @@ export const pastNoon: Framework = {
         ],
         answer: landClock.ampm,
         hint: crossing
-          ? "She stepped across 🥪 lunch — the gold half ends there, so she's in the purple 🌙 half now. The flip happens all by itself!"
+          ? "She reached 🥪 lunch — that's exactly where the gold half ends, so she's in the purple 🌙 half now. The flip happens all by itself!"
           : `All ${hop} ${plural(hop)} stay under the gold ☀️ ribbon — no lunch crossed, no flip.`,
         decoyQuestions: [
           "How many hops did Aoife make?",

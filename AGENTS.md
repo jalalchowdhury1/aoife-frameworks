@@ -26,15 +26,16 @@ set.
 - **4-stage ladder per framework** (`lib/engine/`): **Watch** (app works it, narrating each
   question + answer) → **Together** (app asks, she answers, hint on error) → **Lead** (she
   *chooses which question to ask next*, then answers it) → **Solo** (fresh problem, she
-  enters only the final answer; confetti on success).
+  enters only the final answer; confetti on success) — plus a **🔁 Practice** pill (five
+  Solo problems in a row, see §4).
 - **iPad-first**: big touch targets, on-screen numpad, tap over typing, **text only** (no
   audio), works offline during play (no runtime network calls; confetti bundled from npm).
 - **No visible timer, no speed pressure.** Concept mastery, not racing.
 
 ## 2. Architecture — how a framework works (the important part)
 
-One **shared engine** (`lib/engine/StageEngine.tsx` + `StageRunner.tsx`) renders all four
-stages from a single `Problem` object. **Each framework is a self-contained module** at
+One **shared engine** (`lib/engine/StageEngine.tsx` + `StageRunner.tsx`, plus
+`PracticeRunner.tsx` for 🔁 Practice) renders all stages from a single `Problem` object. **Each framework is a self-contained module** at
 `lib/frameworks/<id>.ts` that exports a `Framework` (see `lib/types.ts`):
 
 ```ts
@@ -110,13 +111,14 @@ app/globals.css         — Tailwind v4 theme (pink/purple, Bubblegum Sans) + fr
 lib/types.ts            — Framework / Problem / Step / FigureSpec / Stage
 lib/rng.ts              — seedable RNG (deterministic generators)
 lib/progress.ts         — localStorage progress
-lib/engine/             — StageEngine, StageRunner, Numpad, ChoicePad, ClockInput, DayLineInput, rich (chips)
+lib/engine/             — StageEngine, StageRunner, PracticeRunner, Numpad, ChoicePad, ClockInput, DayLineInput, rich (chips), confetti
 lib/figures/            — Figure dispatcher + 9 figure components
 lib/frameworks/<id>.ts  — one framework each (generator + question-script)
 lib/frameworks/index.ts — FRAMEWORKS registry + byId() + FAMILIES
 lib/frameworks/time-shared.ts — Time & Clocks anchors/cities/warm-up factories
 lib/frameworks/time-ladder.ts — Day 1-9 chapter metadata for the home page
 lib/frameworks/frameworks.test.ts — the 500-seed self-test harness
+lib/stress.test.ts      — 3000-seed Time & Clocks sweep (text sanity, chip discipline, edge invariants)
 docs/superpowers/       — design spec + implementation plan
 ```
 
@@ -126,9 +128,9 @@ docs/superpowers/       — design spec + implementation plan
 
 - **Never commit `node_modules` or npm caches.** `.gitignore` covers them (the old
   `aoife-subtraction-game` repo once committed a 469MB cache — don't repeat it).
-- **No CDN runtime deps.** `canvas-confetti` is bundled from npm and imported in
-  `StageRunner.tsx` — do not reintroduce a CDN `<script>` (the sibling repo deliberately
-  removed one for offline/flaky-wifi resilience).
+- **No CDN runtime deps.** `canvas-confetti` is bundled from npm behind
+  `lib/engine/confetti.ts` — do not reintroduce a CDN `<script>` (the sibling repo
+  deliberately removed one for offline/flaky-wifi resilience).
 - **Vercel deploy:** if the GitHub App link isn't authorized for this repo, use
   `vercel --prod` from the CLI (same situation as `aoife-math`).
 - Adding/removing a framework: update `lib/frameworks/index.ts` and the `frameworks.test.ts`

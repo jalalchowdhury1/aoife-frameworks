@@ -65,7 +65,7 @@ export function warmupHop(rng: Rng): Step {
     input: "number",
     ask: `⭐ Warm-up — remember yesterday? Start at ${c(s, ampm)} and hop ${k} ${plural(k)} forward. What hour do you land on?`,
     answer: s + k,
-    hint: `Count the hops out loud: ${s}… then ${k} more. You never reach 🥪 lunchtime, so nothing tricky happens.`,
+    hint: `Count the hops out loud: ${s}… then ${k} more. You never reach ${ampm === "a.m." ? "🥪 lunchtime" : "💤 midnight"}, so nothing tricky happens.`,
     decoyQuestions: ["Is the time before or after lunch?", "How many hours are in a whole day?"],
   };
 }
@@ -80,13 +80,13 @@ export function warmupCross(rng: Rng): Step {
     id: "warmup",
     warmup: true,
     input: "choice",
-    ask: `⭐ Warm-up — remember yesterday? Aoife is at ${c(s, "a.m.")} and hops ${k} ${plural(k)} forward. Does she hop past 🥪 lunchtime?`,
+    ask: `⭐ Warm-up — remember yesterday? Aoife is at ${c(s, "a.m.")} and hops ${k} ${plural(k)} forward. Does she reach 🥪 lunchtime (or hop past it)?`,
     choices: [
-      { label: "Yes — past lunch, into the 🌙 half", value: "yes" },
+      { label: "Yes — she reaches lunch! 🥪", value: "yes" },
       { label: "No — still in the ☀️ half", value: "no" },
     ],
     answer: yes ? "yes" : "no",
-    hint: `From ${s} o'clock, lunch is ${12 - s} ${plural(12 - s)} away. Is the hop bigger than that?`,
+    hint: `From ${c(s, "a.m.")}, lunch is ${12 - s} hop${12 - s === 1 ? "" : "s"} away. Is her hop at least that big?`,
     decoyQuestions: ["What hour does she land on?", "How many hours are in a whole day?"],
   };
 }

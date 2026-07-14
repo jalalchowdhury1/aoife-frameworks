@@ -26,13 +26,14 @@ export const hopHours: Framework = {
     d.land <= 11 &&
     d.k >= 1 &&
     d.k <= 3 &&
-    d.s >= 1 &&
+    (d.isPm === 1 ? d.s >= 1 && d.s <= 5 : d.s >= 7 && d.s <= 8) &&
     (d.fig === 0 || d.fig === 1),
   generate(rng: Rng): Problem {
     const ampm: AmPm = rng.pick(["a.m.", "p.m."]);
     // Stay inside her waking day: mornings start 7-8 (after wake-up 🌅),
-    // afternoons start 1-8. Both keep s + k <= 11 so lunch is never crossed.
-    const s = ampm === "a.m." ? rng.int(7, 8) : rng.int(1, 8);
+    // afternoons start 1-5 (so even a 3-hour hop ends by 🛏️ 8 p.m. bedtime).
+    // Nothing here ever reaches 12, so no flip and no wrap — that's Day 3.
+    const s = ampm === "a.m." ? rng.int(7, 8) : rng.int(1, 5);
     const k = rng.int(1, Math.min(3, 11 - s));
     const land = s + k;
     const fig = rng.pick([0, 1]); // 0 = day-line hop, 1 = clock-face hop
@@ -64,21 +65,6 @@ export const hopHours: Framework = {
 
     const steps: Step[] = [
       warmupHalf(rng),
-      {
-        id: "same-half",
-        input: "choice",
-        ask: `Aoife hops ${k} ${plural(k)} forward from ${c(s, ampm)}. Does she stay in the same half of the day?`,
-        choices: [
-          { label: "Yes — same half", value: "same" },
-          { label: "No — the half flips", value: "flips" },
-        ],
-        answer: "same",
-        hint: `Look at the day-line: every hop stays under the ${ampm === "a.m." ? "gold ☀️" : "purple 🌙"} ribbon — she never reaches 🥪 lunchtime${ampm === "p.m." ? " or 💤 midnight" : ""}.`,
-        decoyQuestions: [
-          "How many hours are in a whole day?",
-          "What time is lunch?",
-        ],
-      },
       {
         id: "land",
         input: fig === 0 ? "line-hop" : "clock-set",

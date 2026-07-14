@@ -54,7 +54,7 @@ export const clock24: Framework = {
     ];
 
     return {
-      promptText: `Some clocks never start over after lunch — they keep counting: 1 p.m. becomes 13, 2 p.m. becomes 14… What does the keep-counting clock say at ${c(h12, ampm)}?`,
+      promptText: `Some clocks never start over after lunch — they keep counting: ${c(1, "p.m.")} becomes 13, ${c(2, "p.m.")} becomes 14… What does the keep-counting clock say at ${c(h12, ampm)}?`,
       // No highlight — finding the cell (and reading under it) IS the task.
       figure: {
         kind: "dayLine",
