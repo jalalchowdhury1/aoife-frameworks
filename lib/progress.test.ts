@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { readProgress, recordStageDone, recordSolo, PROGRESS_KEY } from "./progress";
+import { readProgress, recordStageDone, recordSolo, recordPractice, PROGRESS_KEY } from "./progress";
 
 const store: Record<string, string> = {};
 beforeEach(() => {
@@ -21,6 +21,22 @@ beforeEach(() => {
 });
 
 describe("progress", () => {
+  it("records practice runs and perfect runs additively", () => {
+    recordPractice("two-kinds", false);
+    recordPractice("two-kinds", true);
+    const e = readProgress()["two-kinds"];
+    expect(e.practiceRuns).toBe(2);
+    expect(e.perfectRuns).toBe(1);
+    expect(e.stageReached).toBe(0); // untouched
+  });
+  it("practice fields default safely on old records", () => {
+    recordSolo("two-kinds"); // creates a record without practice fields
+    recordPractice("two-kinds", true);
+    const e = readProgress()["two-kinds"];
+    expect(e.practiceRuns).toBe(1);
+    expect(e.perfectRuns).toBe(1);
+    expect(e.soloPasses).toBe(1);
+  });
   it("starts empty", () => {
     expect(readProgress()["two-kinds"]).toBeUndefined();
   });

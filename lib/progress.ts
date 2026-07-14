@@ -5,6 +5,8 @@ export interface FwProgress {
   stageReached: number;
   soloPasses: number;
   lastPlayed: string;
+  practiceRuns?: number; // completed 🔁 5-in-a-row runs
+  perfectRuns?: number; // runs where all five were first-try ⭐
 }
 export type Progress = Record<string, FwProgress>;
 
@@ -40,6 +42,16 @@ export function recordSolo(id: string) {
   const e = entry(p, id);
   e.stageReached = Math.max(e.stageReached, 4);
   e.soloPasses += 1;
+  e.lastPlayed = today();
+  p[id] = e;
+  write(p);
+}
+
+export function recordPractice(id: string, perfect: boolean) {
+  const p = readProgress();
+  const e = entry(p, id);
+  e.practiceRuns = (e.practiceRuns ?? 0) + 1;
+  if (perfect) e.perfectRuns = (e.perfectRuns ?? 0) + 1;
   e.lastPlayed = today();
   p[id] = e;
   write(p);
