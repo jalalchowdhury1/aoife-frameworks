@@ -9,11 +9,14 @@ import {
   readProgress,
   recordStageDone,
   recordSolo,
+  recordPractice,
   isUnlocked,
   type Progress,
 } from "../progress";
 import { Figure } from "../figures/Figure";
 import { renderRich } from "./rich";
+import { fireConfetti } from "./confetti";
+import { PracticeRunner } from "./PracticeRunner";
 import { StageRunner } from "./StageRunner";
 
 function startStageFor(progress: Progress, id: string): Stage {
@@ -27,6 +30,8 @@ export function StageEngine({ framework }: { framework: Framework }) {
   const [stage, setStage] = useState<Stage>("watch");
   const [seed, setSeed] = useState(1);
   const [finished, setFinished] = useState<Stage | null>(null);
+  const [mode, setMode] = useState<"stages" | "practice">("stages");
+  const [practiceDone, setPracticeDone] = useState<null | { perfect: boolean }>(null);
 
   // Client-only init: read progress + pick the starting stage + a random problem.
   // localStorage/Math.random must run after mount (not in render) to avoid hydration
@@ -57,9 +62,25 @@ export function StageEngine({ framework }: { framework: Framework }) {
   };
 
   const goStage = (s: Stage) => {
+    setMode("stages");
+    setPracticeDone(null);
     setStage(s);
     setSeed(randomSeed());
     setFinished(null);
+  };
+
+  const goPractice = () => {
+    setMode("practice");
+    setPracticeDone(null);
+    setSeed(randomSeed());
+    setFinished(null);
+  };
+
+  const finishPractice = (perfect: boolean) => {
+    recordPractice(framework.id, perfect);
+    setProgress(readProgress());
+    void fireConfetti(perfect);
+    setPracticeDone({ perfect });
   };
 
   const again = () => {
@@ -87,10 +108,10 @@ export function StageEngine({ framework }: { framework: Framework }) {
       </div>
 
       {/* Stage picker */}
-      <div className="grid grid-cols-4 gap-1 mb-3">
+      <div className="grid grid-cols-5 gap-1 mb-3">
         {STAGES.map((s) => {
           const unlocked = isUnlocked(progress, framework.id, s);
-          const active = s === stage && !finished;
+          const active = mode === "stages" && s === stage && !finished;
           return (
             <button
               key={s}
@@ -109,9 +130,60 @@ export function StageEngine({ framework }: { framework: Framework }) {
             </button>
           );
         })}
+        <button
+          type="button"
+          disabled={!isUnlocked(progress, framework.id, "solo")}
+          onClick={goPractice}
+          className={`rounded-xl py-2 text-xs font-bold transition-all ${
+            mode === "practice" && !practiceDone
+              ? "bg-amber-400 text-white"
+              : isUnlocked(progress, framework.id, "solo")
+                ? "bg-amber-100 text-amber-700 active:scale-95"
+                : "bg-gray-100 text-gray-300"
+          }`}
+        >
+          🔁 Practice
+        </button>
       </div>
 
-      {finished ? (
+      {mode === "practice" ? (
+        practiceDone ? (
+          <div className="text-center py-6 animate-bounce-in">
+            <div className="text-5xl mb-2">{practiceDone.perfect ? "🏆" : "🎉"}</div>
+            <div className="text-2xl font-bold text-purple-800 mb-1">
+              {practiceDone.perfect ? "PERFECT — five stars in a row!" : "Five in a row — done!"}
+            </div>
+            <div className="text-sm text-purple-400 mb-5">{framework.title}</div>
+            <div className="flex flex-col gap-2 max-w-xs mx-auto">
+              <button
+                type="button"
+                onClick={goPractice}
+                className="bg-amber-400 text-white rounded-2xl py-3 font-bold text-lg active:scale-95"
+              >
+                🔁 Practice again
+              </button>
+              <Link
+                href="/"
+                className="bg-purple-100 text-purple-700 rounded-2xl py-3 font-bold text-lg active:scale-95"
+              >
+                🏠 Home
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="text-center text-sm text-amber-600 font-bold mb-2">
+              🔁 Practice — five in a row, all by yourself!
+            </div>
+            <PracticeRunner
+              key={`practice:${seed}`}
+              framework={framework}
+              baseSeed={seed}
+              onFinish={finishPractice}
+            />
+          </>
+        )
+      ) : finished ? (
         <EndPanel
           stage={finished}
           frameworkTitle={framework.title}
