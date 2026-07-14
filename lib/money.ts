@@ -48,32 +48,47 @@ export function greedySteps(cents: number): { steps: Step[]; total: number } {
   );
   const steps: Step[] = [];
   let remaining = cents;
-  for (const { c, count } of used) {
+  used.forEach(({ c, count }, i) => {
     const left = remaining - count * c.value;
+    // Honest framing: only call it "biggest coin first" when it IS the biggest
+    // coin; if bigger coins were too big, say so — that's the greedy lesson.
+    const lead =
+      i > 0
+        ? "Next size down."
+        : c.value === 25
+          ? "Biggest coin first."
+          : `A quarter is too big for ${remaining}¢, so take the biggest coin that fits.`;
     steps.push({
       id: `fit-${c.name}`,
       input: "number",
-      ask: `Biggest coin first. How many ${c.plural} (${c.value}¢) fit into ${remaining}¢?`,
+      ask: `${lead} How many ${c.plural} (${c.value}¢) fit into ${remaining}¢?`,
       answer: count,
       hint: `How many ${c.value}s are in ${remaining}? That leaves ${left}¢ for smaller coins.`,
+      // NOTE: never use "Which coin should you try next?" as a decoy here —
+      // that IS the greedy lesson's own self-question (2026-07-15 audit).
       decoyQuestions: [
         `How much money is left over after the ${c.plural}?`,
-        "Which coin should you try next?",
+        "How many coins are in the whole piggy bank?",
       ],
     });
     remaining = left;
-  }
-  const sum = used.map((u) => `${u.count}`).join(" + ");
-  steps.push({
-    id: "coin-total",
-    input: "number",
-    ask: `Count all the coins you used: ${sum}`,
-    answer: g.total,
-    hint: `Add up how many of each coin you used: ${sum}.`,
-    decoyQuestions: [
-      "How much money was it in all?",
-      "Which coin did you use the most of?",
-    ],
   });
+  // With a single coin type the "count them all" step would state its own
+  // answer ("Count all the coins you used: 2" → 2), so skip it — the fit step
+  // already IS the final answer.
+  if (used.length > 1) {
+    const sum = used.map((u) => `${u.count}`).join(" + ");
+    steps.push({
+      id: "coin-total",
+      input: "number",
+      ask: `Count all the coins you used: ${sum}`,
+      answer: g.total,
+      hint: `Add up how many of each coin you used: ${sum}.`,
+      decoyQuestions: [
+        "How much money was it in all?",
+        "Which coin did you use the most of?",
+      ],
+    });
+  }
   return { steps, total: g.total };
 }

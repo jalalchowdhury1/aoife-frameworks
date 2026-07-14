@@ -37,7 +37,7 @@ export const coinCounter: Framework = {
         hint: `${q} quarter${q === 1 ? "" : "s"} at 25¢ each: ${q} × 25.`,
         decoyQuestions: [
           "How many coins are there in all?",
-          "What are the pennies worth?",
+          "What is one quarter worth?",
         ],
       },
       {

@@ -34,11 +34,11 @@ export const shapeEquations: Framework = {
         id: "pick-eq",
         input: "choice",
         ask: "Which equation has only ONE kind of shape? Solve that one first.",
-        choices: [
+        choices: rng.shuffle([
           { label: eq1, value: "eq1" },
           { label: eq2, value: "eq2" },
           { label: eq3, value: "eq3" },
-        ],
+        ]),
         answer: "eq1",
         hint: `Look for the equation that uses the SAME shape twice — that's ${eq1}.`,
         decoyQuestions: [

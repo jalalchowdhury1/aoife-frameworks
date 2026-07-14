@@ -32,10 +32,10 @@ export const fenceposts: Framework = {
         id: "ends",
         input: "choice",
         ask: `Are there ${things} at BOTH ends, or only in the gaps?`,
-        choices: [
+        choices: rng.shuffle([
           { label: "At both ends", value: "both" },
           { label: "Only in the gaps", value: "gaps" },
-        ],
+        ]),
         answer: "both",
         hint: `The first one and the last one are both ${things} — so they sit at both ends.`,
         decoyQuestions: [

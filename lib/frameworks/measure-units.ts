@@ -28,14 +28,14 @@ export const measureUnits: Framework = {
         id: "sameUnit",
         input: "choice",
         ask: "Are both lengths in the SAME unit?",
-        choices: [
+        choices: rng.shuffle([
           { label: "No — one is feet, one is inches", value: "no" },
           { label: "Yes", value: "yes" },
-        ],
+        ]),
         answer: "no",
         hint: `One ${item} is in FEET, the other is in INCHES. Those are different units.`,
         decoyQuestions: [
-          `What is ${aFt} + ${bIn}?`,
+          `Can you add feet and inches straight together?`,
           `How many inches longer is it?`,
         ],
       },

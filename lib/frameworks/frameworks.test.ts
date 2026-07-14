@@ -35,8 +35,11 @@ describe("every framework generator", () => {
           // problem (this step's answer, or any final answer) — otherwise the
           // wrong question rewards/teaches the wrong arithmetic. Guards the whole
           // "decoy-correct" class found in the 2026-06-10 audit.
+          // ...compared against EVERY numeric answer in the problem, not just
+          // this step's — a decoy computing a sibling step's answer teaches the
+          // wrong move too (widened 2026-07-15).
           const realValues = new Set<number>([
-            ...(NUMERIC.has(s.input) ? [s.answer as number] : []),
+            ...p.steps.filter((st) => NUMERIC.has(st.input)).map((st) => st.answer as number),
             ...p.finalAnswers.map((fa) => fa.value),
           ]);
           for (const decoy of s.decoyQuestions) {
@@ -83,6 +86,33 @@ describe("every framework generator", () => {
       }
     });
   }
+  // A choice step whose correct button sits at the same position on every
+  // seed lets the child pattern-match position instead of reading. Every
+  // choice-step id must move its answer around (or the options themselves
+  // must vary the answer) across seeds.
+  it("no choice step keeps its answer at a fixed position across all seeds", () => {
+    const violations: string[] = [];
+    for (const fw of FRAMEWORKS) {
+      const indexesByStep = new Map<string, Set<number>>();
+      const seen = new Map<string, number>();
+      for (let seed = 1; seed <= 500; seed++) {
+        const p = fw.generate(makeRng(seed));
+        for (const s of p.steps) {
+          if (s.input !== "choice" || !s.choices) continue;
+          const idx = s.choices.findIndex((c) => c.value === s.answer);
+          if (!indexesByStep.has(s.id)) indexesByStep.set(s.id, new Set());
+          indexesByStep.get(s.id)!.add(idx);
+          seen.set(s.id, (seen.get(s.id) ?? 0) + 1);
+        }
+      }
+      for (const [stepId, idxs] of indexesByStep) {
+        if ((seen.get(stepId) ?? 0) < 50) continue; // rare variants — not enough signal
+        if (idxs.size < 2) violations.push(`${fw.id} step "${stepId}" (always choice #${[...idxs][0]})`);
+      }
+    }
+    expect(violations, `shuffle the choices in: ${violations.join(", ")}`).toEqual([]);
+  });
+
   it("registry has 32 unique ids", () => {
     expect(FRAMEWORKS.length).toBe(32);
     expect(new Set(FRAMEWORKS.map((f) => f.id)).size).toBe(32);

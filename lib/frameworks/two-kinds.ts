@@ -32,11 +32,11 @@ export const twoKinds: Framework = {
         id: "kinds",
         input: "choice",
         ask: "What two kinds of things are in this problem?",
-        choices: [
+        choices: rng.shuffle([
           { label: `${s.a} & ${s.b}`, value: `${s.a} & ${s.b}` },
           { label: `${s.unit} & numbers`, value: "x1" },
           { label: `boxes & bags`, value: "x2" },
-        ],
+        ]),
         answer: `${s.a} & ${s.b}`,
         hint: `Look at the very first sentence — the two things it names.`,
         decoyQuestions: [`What is ${total} + ${attr}?`, `How many ${s.b} are there?`],
@@ -57,7 +57,7 @@ export const twoKinds: Framework = {
         hint: `A ${s.bOne} has ${s.lb} ${s.unit}.`,
         decoyQuestions: [
           `How many ${s.unit} does one ${s.aOne} have?`,
-          `What is ${attr} − ${total}?`,
+          `Which ${s.bOne} is the biggest?`,
         ],
       },
       {

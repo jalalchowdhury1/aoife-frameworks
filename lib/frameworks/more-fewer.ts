@@ -47,10 +47,10 @@ export const moreFewer: Framework = {
         id: "bigger",
         input: "choice",
         ask: "Which group is bigger?",
-        choices: [
+        choices: rng.shuffle([
           { label: `${s.whoBig} (${big})`, value: "big" },
           { label: `${s.whoSmall} (${small})`, value: "small" },
-        ],
+        ]),
         answer: "big",
         hint: `${big} is more than ${small}, so the one with ${big} is bigger.`,
         decoyQuestions: [

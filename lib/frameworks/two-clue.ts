@@ -32,10 +32,10 @@ export const twoClue: Framework = {
         id: "clue1",
         input: "choice",
         ask: "Turn clue 1 into a relationship:",
-        choices: [
+        choices: rng.shuffle([
           { label: `${s.moverP} = ${s.spotP} + ${a}`, value: "r1" },
           { label: `${s.moverP} = ${s.spotP} − ${a}`, value: "wrong1" },
-        ],
+        ]),
         answer: "r1",
         hint: `If ${count(a, s.moverS, s.moverP)} left over with no ${s.spotS}, there are more ${s.moverP} than ${s.spotP}.`,
         decoyQuestions: [`How many ${s.spotP} are empty?`, `What is ${a} + ${b}?`],
@@ -44,10 +44,10 @@ export const twoClue: Framework = {
         id: "clue2",
         input: "choice",
         ask: "Turn clue 2 into a relationship:",
-        choices: [
+        choices: rng.shuffle([
           { label: `${s.moverP} = 2 × (${s.spotP} − ${b})`, value: "r2" },
           { label: `${s.moverP} = 2 × ${s.spotP}`, value: "wrong2" },
-        ],
+        ]),
         answer: "r2",
         hint: `${count(b, s.spotS, s.spotP)} empty, so the other ${s.spotP} hold 2 ${s.moverP} each.`,
         decoyQuestions: [`How many ${s.moverP} are left over?`, `What is ${b} × 2?`],

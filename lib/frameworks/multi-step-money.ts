@@ -55,10 +55,10 @@ export const multiStepMoney: Framework = {
         id: "want",
         input: "choice",
         ask: "What does the question want now?",
-        choices: [
+        choices: rng.shuffle([
           { label: `${s.b} at $${q} each`, value: "b" },
           { label: `More ${s.a}`, value: "a" },
-        ],
+        ]),
         answer: "b",
         hint: `Read the last sentence — it asks about the ${s.b}.`,
         decoyQuestions: [

@@ -31,10 +31,10 @@ export const crossNumberGrid: Framework = {
         id: "pick-line",
         input: "choice",
         ask: "Find a row or column with only ONE empty box. Which one is easiest to solve first?",
-        choices: [
+        choices: rng.shuffle([
           { label: `The top row (${a} + ${b} = ?)`, value: "toprow" },
           { label: "The middle column", value: "midcol" },
-        ],
+        ]),
         answer: "toprow",
         hint: "Look for a line where two numbers are already shown and only the answer box is blank.",
         decoyQuestions: [

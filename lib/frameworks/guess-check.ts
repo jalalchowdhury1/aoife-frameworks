@@ -37,7 +37,7 @@ export const guessCheck: Framework = {
         decoyQuestions: [
           `What is ${P} + ${S}?`,
           `What is ${P} × ${S}?`,
-          `What is the LARGER number?`,
+          `Can the two numbers be the same?`,
         ],
       },
       {
@@ -45,7 +45,7 @@ export const guessCheck: Framework = {
         input: "number",
         ask: `Its partner is ${P} ÷ ${x}. What is the LARGER number?`,
         answer: y,
-        hint: `The two numbers multiply to ${P}: ${P} ÷ ${x} = ${y}. Now check it — ${x} + ${y} should equal ${S}.`,
+        hint: `The two numbers multiply to ${P}, so share it out: what is ${P} ÷ ${x}? Then check — the pair should add up to ${S}.`,
         decoyQuestions: [
           `What is ${P} × ${x}?`,
           `What is ${P} + ${x}?`,

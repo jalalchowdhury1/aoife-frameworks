@@ -65,9 +65,15 @@ seeds** and asserts:
 3. Every `input:'choice'` step has ≥2 `choices`, one of which has `.value === answer`.
 4. Every `finalAnswers[i].value` is a **non-negative integer**, is **reached** by some numeric
    step, and the **last step's answer is a final answer** (the script must end on the answer).
-5. No "What is A op B?" decoy may evaluate to a real answer.
+5. No "What is A op B?" decoy may evaluate to ANY numeric step answer or final
+   answer in its problem (widened 2026-07-15 from same-step-only).
 6. `invariant(data)` is **true** for every generated problem.
 7. Figure/`inputSpec` numbers must match `data` (`lib/figures/figures.test.ts`, 300 seeds).
+8. **No choice step may keep its correct answer at a fixed position across seeds**
+   (added 2026-07-15 — nine steps let the child pattern-match "top button" instead of
+   reading). When a step's correct option is constant, wrap the choices in
+   `rng.shuffle([...])`. Steps whose ANSWER varies seed-to-seed (yes/no, ☀️/🌙) may keep
+   a fixed, consistent option order — that's good UX, and the rule passes automatically.
 
 **Keep the arithmetic small and clean.** The child is ~7 and good at computation — the
 *thinking* is the challenge, never the numbers. If a generated value could go negative or
@@ -135,6 +141,11 @@ docs/superpowers/       — design spec + implementation plan
   `vercel --prod` from the CLI (same situation as `aoife-math`).
 - Adding/removing a framework: update `lib/frameworks/index.ts` and the `frameworks.test.ts`
   count assertion (`FRAMEWORKS.length`) together.
+- **Decoy hygiene** (2026-07-15 audit): never use a framework's own taught self-question as
+  a decoy (e.g. "Which coin should you try next?" in the greedy money scripts — picking it
+  punished exactly the reasoning being taught). Hints shown after a wrong answer must be
+  boundary-exact ("at least that big", never "bigger than" where equality counts) and must
+  never state the answer verbatim.
 
 ## 7. Time & Clocks — the 9-day ladder (redesigned 2026-07-11, don't "simplify" away)
 

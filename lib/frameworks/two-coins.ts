@@ -45,11 +45,11 @@ export const twoCoins: Framework = {
         id: "kinds",
         input: "choice",
         ask: "What two kinds of coins are in the pile?",
-        choices: [
+        choices: rng.shuffle([
           { label: `${hi.pl} & ${lo.pl}`, value: `${hi.pl} & ${lo.pl}` },
           { label: "dimes & dollars", value: "x1" },
           { label: "coins & cents", value: "x2" },
-        ],
+        ]),
         answer: `${hi.pl} & ${lo.pl}`,
         hint: "Read the first sentence — it names the two kinds of coins.",
         decoyQuestions: [
@@ -126,7 +126,7 @@ export const twoCoins: Framework = {
     ];
 
     return {
-      promptText: `${name} has ${coins} coins. They are all ${hi.pl} and ${lo.pl}. Altogether they are worth ${value}¢. How many ${hi.pl} and how many ${lo.pl} does ${name} have?`,
+      promptText: `${name} has ${coins} coins. Every coin is either a ${hi.one} or a ${lo.one}. Altogether they are worth ${value}¢. How many ${hi.pl} and how many ${lo.pl} does ${name} have?`,
       steps,
       finalAsk: `How many ${hi.pl}? How many ${lo.pl}?`,
       finalAnswers: [

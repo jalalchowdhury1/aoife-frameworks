@@ -30,11 +30,11 @@ export const numberBonds: Framework = {
         id: "rule",
         input: "choice",
         ask: "What does each square equal?",
-        choices: [
+        choices: rng.shuffle([
           { label: "the sum of the two circles next to it", value: "sum" },
           { label: "the bigger circle next to it", value: "max" },
           { label: "the two circles multiplied", value: "times" },
-        ],
+        ]),
         answer: "sum",
         hint: `Read the rule at the top — a square ADDS its two circle neighbours.`,
         decoyQuestions: [
